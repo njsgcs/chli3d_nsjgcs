@@ -25,6 +25,7 @@ export interface IDocument extends IPropertyChanged, IDisposable, ISerialize {
     readonly selection: ISelection;
     readonly id: string;
     readonly history: History;
+
     readonly visual: IVisual;
     readonly application: IApplication;
     materials: ObservableCollection<Material>;

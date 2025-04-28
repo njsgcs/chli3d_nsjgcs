@@ -32,7 +32,7 @@ export class MainWindow implements IWindow {
     private _inited: boolean = false;
     private _home?: Home;
     private _editor?: Editor;
-
+    private history: string = "";
     constructor(readonly tabs: RibbonTab[]) {
         this.setTheme("light");
     }
@@ -58,21 +58,30 @@ export class MainWindow implements IWindow {
             const property = await njsgcs_get_property.get_property(app); // 等待异步结果
             callback(property!);
         });
-        PubSub.default.sub("njsgcs_makebox", (length: number, width: number, height: number) => {
-            Logger.info("makebox!!!!");
+        PubSub.default.sub(
+            "njsgcs_makebox",
+            (ox: number, oy: number, oz: number, length: number, width: number, height: number) => {
+                Logger.info("makebox!!!!");
 
-            const boxnode = new BoxNode(
-                app.activeView?.document!,
-                new Plane(XYZ.zero, XYZ.unitZ, XYZ.unitX),
-                length,
-                width,
-                height,
-            );
-            app.activeView?.document.addNode(boxnode);
-            app.activeView?.update();
-            app.activeView?.cameraController.fitContent();
-        });
+                const boxnode = new BoxNode(
+                    app.activeView?.document!,
+                    new Plane(new XYZ(ox, oy, oz), XYZ.unitZ, XYZ.unitX),
+                    length,
+                    width,
+                    height,
+                );
+                app.activeView?.document.addNode(boxnode);
+                app.activeView?.update();
+                app.activeView?.cameraController.fitContent();
+            },
+        );
         PubSub.default.sub("showPermanent", Permanent.show);
+        PubSub.default.sub("gethistory", (part_history: string) => {
+            this.history += part_history;
+        });
+        PubSub.default.sub("downhistory", () => {
+            Logger.info(this.history);
+        });
         PubSub.default.sub("activeViewChanged", (view) => displayHome(app, view === undefined));
         PubSub.default.sub("displayHome", (show) => displayHome(app, show));
     }

@@ -4,6 +4,7 @@
 import { Button, CommandKeys, I18nKeys, IApplication, RibbonTab } from "chili-core";
 import { div } from "./components";
 import style from "./editor.module.css";
+import { njsgcs_MakeView } from "./njsgcs/njsgcs_makeView";
 import { njsgcs_ProjectView } from "./njsgcs/njsgcs_projectView";
 
 import { ProjectView } from "./project";
@@ -42,13 +43,12 @@ export class Editor extends HTMLElement {
 
                         new PropertyView({ className: style.sidebarItem }),
 
-                        (() => {
-                            const njsgcs_projectView = new njsgcs_ProjectView({
-                                className: style.sidebarItem,
-                            });
-
-                            return njsgcs_projectView;
-                        })(),
+                        new njsgcs_ProjectView({
+                            className: style.sidebarItem,
+                        }),
+                        new njsgcs_MakeView({
+                            className: style.sidebarItem,
+                        }),
                     ),
                     viewport,
                 ),

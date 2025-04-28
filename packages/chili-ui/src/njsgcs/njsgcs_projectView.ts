@@ -1,8 +1,8 @@
 // Part of the Chili3d Project, under the AGPL-3.0 License.
 // See LICENSE file in the project root for full license information.
 
-import { IDocument, Logger, PubSub } from "chili-core";
-import { button, div, Expander, input } from "../components";
+import { IDocument, IView, Logger, PubSub } from "chili-core";
+import { button, div, Expander, textarea } from "../components";
 import style from "../property/propertyView.module.css";
 import { send_to_llm } from "./njsgcs_send_to_llm";
 export class njsgcs_ProjectView extends HTMLElement {
@@ -13,7 +13,8 @@ export class njsgcs_ProjectView extends HTMLElement {
 
     private readonly panel: HTMLDivElement;
     private resultLabel: HTMLLabelElement;
-    private user_say_input: HTMLInputElement;
+    private user_say_input: HTMLTextAreaElement;
+
     constructor(props: { className: string }) {
         super();
         this.classList.add(style.root, props.className);
@@ -22,26 +23,31 @@ export class njsgcs_ProjectView extends HTMLElement {
         });
         this.resultLabel = document.createElement("label");
         this.resultLabel.className = style.resultLabel;
-        this.user_say_input = input({
-            type: "text",
+        PubSub.default.sub("activeViewChanged", this.handleActiveViewChanged);
 
+        this.user_say_input = textarea({
             id: "njsgcs_test_input",
             onkeydown: (e: KeyboardEvent) => {
                 e.stopPropagation();
             },
         });
-        this.user_say_input.value = "生成一个10*10*10的正方体";
+        this.user_say_input.value = "请在200,500,600的位置生成一个10*10*10的正方体";
         this.render();
     }
-    private makebox(length: number, width: number, height: number) {
-        PubSub.default.pub("njsgcs_makebox", length, width, height);
+    private readonly handleActiveViewChanged = (view: IView | undefined) => {
+        if (this._activeDocument === view?.document) return;
+
+        this._activeDocument = view?.document;
+    };
+    private makebox(ox: number, oy: number, oz: number, length: number, width: number, height: number) {
+        PubSub.default.pub("njsgcs_makebox", ox, oy, oz, length, width, height);
     }
     private render() {
         const expander = new Expander("njsgcs_sidebar"); // 创建 Expander
 
         // 把原来添加到 this.panel 的内容先添加到 expander 中
         expander.append(
-            div({ className: style.input }, this.user_say_input),
+            div({ className: style.textarea }, this.user_say_input),
             //llm_button
             div(
                 { className: style.buttons },
@@ -104,12 +110,13 @@ export class njsgcs_ProjectView extends HTMLElement {
                     textContent: "ai生成立方体",
                     onclick: async () => {
                         try {
+                            PubSub;
                             Logger.info("按钮接收到点击事件");
                             // 动态获取输入框的值
                             let prompt = `请返回纯代码文本，不要返回其他内容
-                            如果创建一个30*50*60的立方体：
+                            如果在点500,300,560的位置创建一个30*50*60的立方体：
 
-                             this.makebox(30,50,60 )
+                              this.makebox( 500,300 ,560 ,30, 50, 60)
                              `;
 
                             // this.makebox(10,10,10)
@@ -121,6 +128,8 @@ export class njsgcs_ProjectView extends HTMLElement {
                                 model: "deepseek-chat",
                             });
                             const result = await send_to_llm(body);
+                            PubSub.default.pub("gethistory", result);
+
                             eval(result);
                         } catch (error) {
                             Logger.error("Failed to parse response as JSON:", error);
@@ -137,4 +146,4 @@ export class njsgcs_ProjectView extends HTMLElement {
     }
 }
 
-customElements.define("chili-project-njsgcs_view", njsgcs_ProjectView);
+customElements.define("chili-project-njsgcs-view", njsgcs_ProjectView);

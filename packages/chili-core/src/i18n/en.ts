@@ -224,5 +224,6 @@ export default {
         njsgcs_send_to_llm: "njsgcs send to llm",
         njsgcs_showDialog: "njsgcs showDialog",
         njsgcs_sidebar: "njsgcs sidebar",
+        njsgcs_makeview: "njsgcs makeview",
     },
 } satisfies Locale;

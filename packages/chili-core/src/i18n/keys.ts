@@ -217,6 +217,7 @@ const I18N_KEYS = [
     "njsgcs_showDialog",
     "njsgcs_send_to_llm",
     "njsgcs_sidebar",
+    "njsgcs_makeview",
 ] as const;
 
 export type I18nKeys = (typeof I18N_KEYS)[number];

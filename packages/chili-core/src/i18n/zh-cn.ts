@@ -222,5 +222,6 @@ export default {
         njsgcs_showDialog: "njsgcs创建窗口",
         njsgcs_send_to_llm: "发送到llm",
         njsgcs_sidebar: "njsgcs 侧边栏",
+        njsgcs_makeview: "参数建模视图",
     },
 } satisfies Locale;

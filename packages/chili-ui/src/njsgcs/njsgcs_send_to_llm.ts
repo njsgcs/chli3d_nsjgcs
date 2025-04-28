@@ -3,7 +3,7 @@ import { API_KEY } from "./api_key";
 export async function send_to_llm(bodystring: string): Promise<string> {
     Logger.info("llm接收到请求" + bodystring);
     const myHeaders = new Headers();
-    myHeaders.append("Authorization", API_KEY);
+    myHeaders.append("Authorization", "Bearer " + API_KEY);
     myHeaders.append("Content-Type", "application/json");
 
     const requestOptions: RequestInit = {

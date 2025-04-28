@@ -10,6 +10,12 @@
     flex: 0;
 }
 
+.textarea textarea {
+    width: 200px;
+    padding: 5px 5px;
+    height: 80px;
+}
+
 .panel {
     flex: 1;
     padding: 10px;
