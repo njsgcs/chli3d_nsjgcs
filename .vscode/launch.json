@@ -16,7 +16,7 @@
         },
         {
             "name": "debug",
-            "type": "msedge",
+            "type": "firefox",
             "request": "launch",
             "url": "http://localhost:8080/"
         },
