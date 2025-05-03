@@ -1,9 +1,9 @@
 import { Logger } from "chili-core";
-///import { API_KEY } from "./api_key";
+import { deepseek_OPENAI_API_KEY } from "./api_key";
 export async function send_to_llm(bodystring: string): Promise<string> {
     Logger.info("llm接收到请求" + bodystring);
     const myHeaders = new Headers();
-    //   myHeaders.append("Authorization", "Bearer " + API_KEY);
+    myHeaders.append("Authorization", "Bearer " + deepseek_OPENAI_API_KEY);
     myHeaders.append("Content-Type", "application/json");
 
     const requestOptions: RequestInit = {
