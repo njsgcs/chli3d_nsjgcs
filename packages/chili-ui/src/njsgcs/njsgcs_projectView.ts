@@ -7,6 +7,7 @@ import style from "../property/propertyView.module.css";
 import { send_to_llm } from "./njsgcs_send_to_llm";
 export class njsgcs_ProjectView extends HTMLElement {
     private _activeDocument: IDocument | undefined;
+    private _activeView: IView | undefined;
     get activeDocument() {
         return this._activeDocument;
     }
@@ -36,7 +37,7 @@ export class njsgcs_ProjectView extends HTMLElement {
     }
     private readonly handleActiveViewChanged = (view: IView | undefined) => {
         if (this._activeDocument === view?.document) return;
-
+        this._activeView = view;
         this._activeDocument = view?.document;
     };
     private makebox(ox: number, oy: number, oz: number, length: number, width: number, height: number) {
@@ -131,6 +132,16 @@ export class njsgcs_ProjectView extends HTMLElement {
                             PubSub.default.pub("gethistory", result);
 
                             eval(result);
+                        } catch (error) {
+                            Logger.error("Failed to parse response as JSON:", error);
+                        }
+                    },
+                }),
+                button({
+                    textContent: "截图",
+                    onclick: async () => {
+                        try {
+                            this._activeView?.downloadImage();
                         } catch (error) {
                             Logger.error("Failed to parse response as JSON:", error);
                         }

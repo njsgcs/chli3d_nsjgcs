@@ -155,6 +155,23 @@ export class ThreeView extends Observable implements IView {
         this._renderer.render(this._scene, this.camera);
         return this.renderer.domElement.toDataURL();
     }
+    downloadImage() {
+        this._renderer.render(this._scene, this.camera);
+        const dataUrl = this.renderer.domElement.toDataURL("image/png");
+        const now = new Date();
+        const timestamp = now
+            .toISOString()
+            .replace(/[^0-9]/g, "")
+            .slice(0, 14); // 格式：YYYYMMDDHHmmSS
+        const filename = `screenshot-${timestamp}.png`;
+        // 创建一个 <a> 元素并触发下载
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 
     get workplane(): Plane {
         return this._workplane;

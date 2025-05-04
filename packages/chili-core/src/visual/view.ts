@@ -21,6 +21,7 @@ export interface IView extends IPropertyChanged, IDisposable {
     update(): void;
     up(): XYZ;
     toImage(): string;
+    downloadImage(): void;
     direction(): XYZ;
     rayAt(mx: number, my: number): Ray;
     screenToWorld(mx: number, my: number): XYZ;
