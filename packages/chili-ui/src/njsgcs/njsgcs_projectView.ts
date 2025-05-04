@@ -43,6 +43,19 @@ export class njsgcs_ProjectView extends HTMLElement {
     private makebox(ox: number, oy: number, oz: number, length: number, width: number, height: number) {
         PubSub.default.pub("njsgcs_makebox", ox, oy, oz, length, width, height);
     }
+
+    private makecylender(
+        normalx: number,
+        normaly: number,
+        normalz: number,
+        ox: number,
+        oy: number,
+        oz: number,
+        radius: number,
+        dz: number,
+    ) {
+        PubSub.default.pub("njsgcs_makecylinder", normalx, normaly, normalz, ox, oy, oz, radius, dz);
+    }
     private render() {
         const expander = new Expander("njsgcs_sidebar"); // 创建 Expander
 
@@ -118,6 +131,8 @@ export class njsgcs_ProjectView extends HTMLElement {
                             如果在点500,300,560的位置创建一个30*50*60的立方体：
 
                               this.makebox( 500,300 ,560 ,30, 50, 60)
+                              如果在点500,300,560的位置创建一个半径30高度50法向为x轴的圆柱体：
+                              this.makecylender(1,0,0, 500,300,560,30, 50)
                              `;
 
                             // this.makebox(10,10,10)

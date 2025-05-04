@@ -36,6 +36,16 @@ export interface PubSubEventMap {
         width: number,
         height: number,
     ) => void;
+    njsgcs_makecylinder: (
+        normalx: number,
+        normaly: number,
+        normalz: number,
+        ox: number,
+        oy: number,
+        oz: number,
+        radius: number,
+        rz: number,
+    ) => void;
     njsgcs_get_property: (callback: (backresult: string) => void) => void;
     openCommandContext: (command: ICommand) => void;
     parentVisibleChanged: (model: INode) => void;

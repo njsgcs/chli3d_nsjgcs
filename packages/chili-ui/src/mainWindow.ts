@@ -1,7 +1,7 @@
 // Part of the Chili3d Project, under the AGPL-3.0 License.
 // See LICENSE file in the project root for full license information.
 
-import { BoxNode } from "chili";
+import { BoxNode, CylinderNode } from "chili";
 import {
     Button,
     CommandKeys,
@@ -71,6 +71,32 @@ export class MainWindow implements IWindow {
                     height,
                 );
                 app.activeView?.document.addNode(boxnode);
+                app.activeView?.update();
+                app.activeView?.cameraController.fitContent();
+            },
+        );
+        PubSub.default.sub(
+            "njsgcs_makecylinder",
+            (
+                normalx: number,
+                normaly: number,
+                normalz: number,
+                ox: number,
+                oy: number,
+                oz: number,
+                radius: number,
+                dz: number,
+            ) => {
+                Logger.info("makecylinder!!!!");
+
+                const cylindernode = new CylinderNode(
+                    app.activeView?.document!,
+                    new XYZ(normalx, normaly, normalz),
+                    new XYZ(ox, oy, oz),
+                    radius,
+                    dz,
+                );
+                app.activeView?.document.addNode(cylindernode);
                 app.activeView?.update();
                 app.activeView?.cameraController.fitContent();
             },
