@@ -32,7 +32,9 @@ export class njsgcs_ProjectView extends HTMLElement {
                 e.stopPropagation();
             },
         });
-        this.user_say_input.value = "请在200,500,600的位置生成一个10*10*10的正方体";
+        //生成由一个立方体和一个圆柱组成的模型
+        //请在200,500,600的位置生成一个10*10*10的正方体
+        this.user_say_input.value = "生成不常见参数尺寸的一个立方体和一个圆柱体重叠的模型";
         this.render();
     }
     private readonly handleActiveViewChanged = (view: IView | undefined) => {
@@ -128,6 +130,8 @@ export class njsgcs_ProjectView extends HTMLElement {
                             Logger.info("按钮接收到点击事件");
                             // 动态获取输入框的值
                             let prompt = `请返回纯代码文本，不要返回其他内容
+                            不要返回注释和点点点：python
+# 创建一个立方体和一个圆柱组成的模型
                             如果在点500,300,560的位置创建一个30*50*60的立方体：
 
                               this.makebox( 500,300 ,560 ,30, 50, 60)
@@ -144,9 +148,10 @@ export class njsgcs_ProjectView extends HTMLElement {
                                 model: "deepseek-chat",
                             });
                             const result = await send_to_llm(body);
-                            PubSub.default.pub("gethistory", result);
+                            const code = result.replace(/```javascript/g, "").replace(/```/g, "");
+                            PubSub.default.pub("gethistory", code);
 
-                            eval(result);
+                            eval(code);
                         } catch (error) {
                             Logger.error("Failed to parse response as JSON:", error);
                         }
