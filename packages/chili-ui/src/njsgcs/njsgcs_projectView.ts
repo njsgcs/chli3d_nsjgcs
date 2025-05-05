@@ -1,7 +1,7 @@
 // Part of the Chili3d Project, under the AGPL-3.0 License.
 // See LICENSE file in the project root for full license information.
-
 import { IDocument, IView, Logger, PubSub } from "chili-core";
+
 import { button, div, Expander, textarea } from "../components";
 import style from "../property/propertyView.module.css";
 import { send_to_llm } from "./njsgcs_send_to_llm";
@@ -24,6 +24,7 @@ export class njsgcs_ProjectView extends HTMLElement {
         });
         this.resultLabel = document.createElement("label");
         this.resultLabel.className = style.resultLabel;
+        this.resultLabel.style.whiteSpace = "pre-line";
         PubSub.default.sub("activeViewChanged", this.handleActiveViewChanged);
 
         this.user_say_input = textarea({
@@ -66,12 +67,47 @@ export class njsgcs_ProjectView extends HTMLElement {
         fileInput.style.display = "none"; // 隐藏输入框
 
         // 处理文件选择事件
-        fileInput.addEventListener("change", (event) => {
+        fileInput.addEventListener("change", async (event) => {
             const target = event.target as HTMLInputElement;
+            this.resultLabel.textContent = "正在上传并检测图像...";
             if (target.files && target.files.length > 0) {
                 const file = target.files[0];
                 Logger.info(`Selected file: ${file.name}`);
-                // 这里可以添加处理图片文件的逻辑
+
+                try {
+                    const reader = new FileReader();
+                    reader.onload = async () => {
+                        try {
+                            const base64Data = reader.result?.toString().split(",")[1];
+                            const response = await fetch("http://localhost:8737", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ image_data: base64Data }),
+                            });
+
+                            if (!response.ok) throw new Error("Network response was not ok");
+
+                            const data = await response.json();
+
+                            const formattedResult = data
+                                .map((item: any, index: number) => {
+                                    const objType = item.Object;
+                                    const confidence = (item.Confidence * 100).toFixed(2);
+                                    const [x1, y1, x2, y2] = item.BoxCoordinate[0];
+                                    return `目标 ${index + 1}: ${objType}, 置信度 ${confidence}%, 坐标 [${x1.toFixed(1)}, ${y1.toFixed(1)}, ${x2.toFixed(1)}, ${y2.toFixed(1)}]`;
+                                })
+                                .join("\n");
+
+                            this.resultLabel.textContent = `检测到 ${data.length} 个物体:\n${formattedResult}`;
+                            Logger.info("YOLO 检测结果:", data);
+                        } catch (error) {
+                            Logger.error("请求失败:", error);
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                } catch (err) {
+                    Logger.error(`处理文件时出错: ${err}`);
+                }
             }
         });
 

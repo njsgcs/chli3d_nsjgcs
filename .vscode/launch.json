@@ -15,6 +15,15 @@
             }
         },
         {
+            "name": "Python: 启动 detect.py 服务",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/yolo_detect/detect.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": []
+        },
+        {
             "name": "debug",
             "type": "firefox",
             "request": "launch",
@@ -32,7 +41,7 @@
     "compounds": [
         {
             "name": "Debug Rspack and Launch Edge",
-            "configurations": ["Debug Rspack", "debug"]
+            "configurations": ["Debug Rspack", "debug", "Python: 启动 detect.py 服务"]
         }
     ]
 }

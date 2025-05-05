@@ -1,17 +1,46 @@
 from ultralytics import YOLO
-import numpy as np
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+import base64
+from io import BytesIO
+from PIL import Image
+import json
+
 # 加载模型
-model = YOLO('./best.pt')
+model = YOLO('./yolo_detect/best.pt')
 
-# 执行预测并获取结果
-results = model.predict(source='./valid/images/screenshot-20250504103355_png.rf.71febf531b60b1e416aece6136e28388.jpg')
+app = Flask(__name__)
+CORS(app)  # 启用跨域支持
 
-# 遍历结果
-for result in results:
-    boxes = result.boxes  # 获取所有检测到的边框
-    for box in boxes:
-        print("BoundingBox: ", box.xyxy)  # 输出边框坐标(x1, y1, x2, y2)
-      
-        print("Confidence: ", box.conf)   # 置信度分数
-        print("Class: ", box.cls)         # 类别ID
-        print("物体是: ",model.names[int(box.cls.item()) ],"范围为: ",box.xyxy.cpu().numpy()) 
+def predict(img_data):
+    image_data = base64.b64decode(img_data)
+    image = Image.open(BytesIO(image_data))
+    results = model.predict(source=image)
+
+    predictions = []
+    for result in results:
+        boxes = result.boxes
+        for box in boxes:
+            predictions.append({
+                "Confidence": box.conf.item(),
+                "Object": model.names[int(box.cls.item())],
+                "BoxCoordinate": box.xyxy.cpu().numpy().tolist()
+            })
+    return predictions
+
+@app.route('/', methods=['POST'])
+def handle_post():
+    payload = request.get_json()
+    img_data = payload.get("image_data")
+
+    if not img_data:
+        return jsonify({"error": "Missing image data"}), 400
+
+    try:
+        result = predict(img_data)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=8737)
