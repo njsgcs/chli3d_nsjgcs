@@ -60,6 +60,20 @@ export class njsgcs_ProjectView extends HTMLElement {
     }
     private render() {
         const expander = new Expander("njsgcs_sidebar"); // 创建 Expander
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.accept = "image/*";
+        fileInput.style.display = "none"; // 隐藏输入框
+
+        // 处理文件选择事件
+        fileInput.addEventListener("change", (event) => {
+            const target = event.target as HTMLInputElement;
+            if (target.files && target.files.length > 0) {
+                const file = target.files[0];
+                Logger.info(`Selected file: ${file.name}`);
+                // 这里可以添加处理图片文件的逻辑
+            }
+        });
 
         // 把原来添加到 this.panel 的内容先添加到 expander 中
         expander.append(
@@ -88,10 +102,6 @@ export class njsgcs_ProjectView extends HTMLElement {
                         }
                     },
                 }),
-            ),
-            //get属性后发送
-            div(
-                { className: style.buttons },
                 button({
                     textContent: "带属性发送",
                     onclick: async () => {
@@ -120,10 +130,12 @@ export class njsgcs_ProjectView extends HTMLElement {
                     },
                 }),
             ),
+            //get属性后发送
+
             div(
                 { className: style.buttons },
                 button({
-                    textContent: "ai生成立方体",
+                    textContent: "ai生成模型",
                     onclick: async () => {
                         try {
                             PubSub;
@@ -168,7 +180,19 @@ export class njsgcs_ProjectView extends HTMLElement {
                     },
                 }),
             ),
-
+            div(
+                { className: style.buttons },
+                button({
+                    textContent: "yolo读图",
+                    onclick: async () => {
+                        try {
+                            fileInput.click();
+                        } catch (error) {
+                            Logger.error("Failed to parse response as JSON:", error);
+                        }
+                    },
+                }),
+            ),
             div({ className: style.result }, this.resultLabel),
         );
         this.panel.append(expander);
