@@ -35,7 +35,8 @@ export class njsgcs_ProjectView extends HTMLElement {
         });
         //生成由一个立方体和一个圆柱组成的模型
         //请在200,500,600的位置生成一个10*10*10的正方体
-        this.user_say_input.value = "生成不常见参数尺寸的一个立方体和一个圆柱体重叠的模型";
+        //生成不常见参数尺寸的一个立方体和一个圆柱体重叠的模型
+        this.user_say_input.value = "帮我分析一下这个物体回复长宽高就行\n";
         this.render();
     }
     private readonly handleActiveViewChanged = (view: IView | undefined) => {
@@ -94,12 +95,12 @@ export class njsgcs_ProjectView extends HTMLElement {
                                     const objType = item.Object;
                                     const confidence = (item.Confidence * 100).toFixed(2);
                                     const [x1, y1, x2, y2] = item.BoxCoordinate[0];
-                                    return `目标 ${index + 1}: ${objType}, 置信度 ${confidence}%, 坐标 [${x1.toFixed(1)}, ${y1.toFixed(1)}, ${x2.toFixed(1)}, ${y2.toFixed(1)}]`;
+                                    return `目标 ${index + 1}: ${objType}, 置信度 ${confidence}%, 左下角坐标 ${x1.toFixed(1)}, ${y1.toFixed(1)},长宽, ${(x2 - x1).toFixed(1)}, ${(y2 - y1).toFixed(1)}`;
                                 })
                                 .join("\n");
 
                             this.resultLabel.textContent = `检测到 ${data.length} 个物体:\n${formattedResult}`;
-                            Logger.info("YOLO 检测结果:", data);
+                            this.user_say_input.value += `${formattedResult}\n`;
                         } catch (error) {
                             Logger.error("请求失败:", error);
                         }
