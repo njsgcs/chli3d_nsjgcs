@@ -21,7 +21,28 @@ export class MeshUtils {
             color: mesh.color,
         };
     }
+    static getAllEdges(face: { positions: Float32Array; indices: Uint16Array | Uint32Array }) {
+        const pointsMap = new Map<string, { count: number; points: number[] }>();
 
+        for (let i = 0; i < face.indices.length; i += 3) {
+            this.addEdge(pointsMap, face, face.indices[i], face.indices[i + 1]);
+            this.addEdge(pointsMap, face, face.indices[i + 1], face.indices[i + 2]);
+            this.addEdge(pointsMap, face, face.indices[i + 2], face.indices[i]);
+        }
+
+        return {
+            outlineEdges: new Float32Array(
+                Array.from(pointsMap.values())
+                    .filter((v) => v.count === 1)
+                    .flatMap((entry) => entry.points),
+            ),
+            sharedEdges: new Float32Array(
+                Array.from(pointsMap.values())
+                    .filter((v) => v.count > 1)
+                    .flatMap((entry) => entry.points),
+            ),
+        };
+    }
     static subFaceOutlines(face: FaceMeshData, index: number) {
         const mesh = this.subFace(face, index);
         if (!mesh) return undefined;

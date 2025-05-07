@@ -6,6 +6,7 @@ import {
     FaceMeshData,
     GeometryNode,
     IVisualGeometry,
+    LineType,
     ShapeNode,
     VisualConfig,
 } from "chili-core";
@@ -74,12 +75,44 @@ export class ThreeGeometry extends ThreeVisualObject implements IVisualGeometry 
         }
     };
 
+    // private generateShape() {
+    //     const mesh = this.geometryNode.mesh;
+    //     if (mesh?.faces?.positions.length) this.initFaces(mesh.faces);
+    //     if (mesh?.edges?.positions.length) this.initEdges(mesh.edges);
+    // }
     private generateShape() {
         const mesh = this.geometryNode.mesh;
-        if (mesh?.faces?.positions.length) this.initFaces(mesh.faces);
+        if (mesh?.faces?.positions.length) {
+            this.initFaces(mesh.faces);
+
+            // 获取所有边
+            const allEdges = MeshUtils.getAllEdges(mesh.faces);
+
+            // 创建并添加共享边
+            if (allEdges.sharedEdges.length > 0) {
+                const sharedEdgesMeshData: EdgeMeshData = {
+                    positions: allEdges.sharedEdges,
+                    groups: [],
+                    lineType: LineType.Solid,
+                    lineWidth: 0.5,
+                    color: 0x888888,
+                };
+
+                const buff = ThreeGeometryFactory.createEdgeBufferGeometry(sharedEdgesMeshData);
+                const sharedEdgesMaterial = new LineMaterial({
+                    linewidth: sharedEdgesMeshData.lineWidth,
+                    color: 0xff0000,
+                    polygonOffset: true,
+                    polygonOffsetFactor: -3,
+                    polygonOffsetUnits: -3,
+                });
+
+                const sharedEdges = new LineSegments2(buff, sharedEdgesMaterial);
+                this.add(sharedEdges);
+            }
+        }
         if (mesh?.edges?.positions.length) this.initEdges(mesh.edges);
     }
-
     override dispose() {
         super.dispose();
         this._edges?.material.dispose();
