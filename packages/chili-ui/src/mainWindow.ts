@@ -53,7 +53,16 @@ export class MainWindow implements IWindow {
         PubSub.default.sub("displayError", Toast.error);
         PubSub.default.sub("showDialog", Dialog.show);
         PubSub.default.sub("njsgcs_showDialog", njsgcs_Dialog.show);
-
+        PubSub.default.sub("njsgcs_changecamera", () => {
+            Logger.info("njsgcs_changecamera!!!!");
+            const cameraController = app.activeView?.cameraController!;
+            // 获取当前相机位置与目标点的距离
+            const distance = cameraController.camera.position.distanceTo(cameraController.target);
+            // 计算新的相机位置（左视图）
+            const newPosition = cameraController.target.clone().add(new XYZ(-distance, 0, 0));
+            cameraController.lookAt(newPosition, cameraController.target, new XYZ(0, 0, 1));
+            app.activeView?.update();
+        });
         PubSub.default.sub("njsgcs_get_property", async (callback) => {
             const property = await njsgcs_get_property.get_property(app); // 等待异步结果
             callback(property!);
@@ -108,6 +117,7 @@ export class MainWindow implements IWindow {
         PubSub.default.sub("downhistory", () => {
             Logger.info(this.history);
         });
+
         PubSub.default.sub("activeViewChanged", (view) => displayHome(app, view === undefined));
         PubSub.default.sub("displayHome", (show) => displayHome(app, show));
     }

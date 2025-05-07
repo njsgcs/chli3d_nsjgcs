@@ -218,6 +218,7 @@ const I18N_KEYS = [
     "njsgcs_send_to_llm",
     "njsgcs_sidebar",
     "njsgcs_makeview",
+    "njsgcs_changecamera",
 ] as const;
 
 export type I18nKeys = (typeof I18N_KEYS)[number];

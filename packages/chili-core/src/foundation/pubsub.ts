@@ -46,6 +46,8 @@ export interface PubSubEventMap {
         radius: number,
         rz: number,
     ) => void;
+    njsgcs_changecamera: () => void;
+
     njsgcs_get_property: (callback: (backresult: string) => void) => void;
     openCommandContext: (command: ICommand) => void;
     parentVisibleChanged: (model: INode) => void;

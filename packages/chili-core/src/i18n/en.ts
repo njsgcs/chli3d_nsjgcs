@@ -225,5 +225,6 @@ export default {
         njsgcs_showDialog: "njsgcs showDialog",
         njsgcs_sidebar: "njsgcs sidebar",
         njsgcs_makeview: "njsgcs makeview",
+        njsgcs_changecamera: "njsgcs changecamera",
     },
 } satisfies Locale;

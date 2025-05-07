@@ -223,5 +223,6 @@ export default {
         njsgcs_send_to_llm: "发送到llm",
         njsgcs_sidebar: "njsgcs 侧边栏",
         njsgcs_makeview: "参数建模视图",
+        njsgcs_changecamera: "切换相机",
     },
 } satisfies Locale;

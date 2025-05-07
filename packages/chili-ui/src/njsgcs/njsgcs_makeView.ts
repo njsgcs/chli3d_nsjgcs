@@ -89,7 +89,7 @@ export class njsgcs_MakeView extends HTMLElement {
                     input({
                         type: "number",
                         id: "length",
-                        defaultValue: "10",
+                        defaultValue: "500",
                         className: style.inputField,
                         onkeydown: (e: KeyboardEvent) => {
                             e.stopPropagation();
@@ -103,7 +103,7 @@ export class njsgcs_MakeView extends HTMLElement {
                     input({
                         type: "number",
                         id: "width",
-                        defaultValue: "10",
+                        defaultValue: "600",
                         className: style.inputField,
                         onkeydown: (e: KeyboardEvent) => {
                             e.stopPropagation();
@@ -117,7 +117,7 @@ export class njsgcs_MakeView extends HTMLElement {
                     input({
                         type: "number",
                         id: "height",
-                        defaultValue: "10",
+                        defaultValue: "700",
                         className: style.inputField,
                         onkeydown: (e: KeyboardEvent) => {
                             e.stopPropagation();

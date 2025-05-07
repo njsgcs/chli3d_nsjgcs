@@ -598,4 +598,18 @@ export class ThreeView extends Observable implements IView {
         };
         return raycaster;
     }
+
+    change(scale: number) {
+        if (this.camera instanceof PerspectiveCamera) {
+            this.camera.fov = this.camera.fov / scale;
+            this.camera.updateProjectionMatrix();
+        } else if (this.camera instanceof OrthographicCamera) {
+            this.camera.left = this.camera.left * scale;
+            this.camera.right = this.camera.right * scale;
+            this.camera.top = this.camera.top * scale;
+            this.camera.bottom = this.camera.bottom * scale;
+            this.camera.updateProjectionMatrix();
+        }
+        this.update();
+    }
 }

@@ -60,7 +60,7 @@ export class RibbonDataContent extends Observable {
 export const QuickButton = (command: ICommand) => {
     const data = Command.getData(command);
     if (!data) {
-        Logger.warn("commandData is undefined");
+        Logger.warn("commandData is undefined\n,pls check the commands/index.ts file");
         return span({ textContent: "null" });
     }
     return svg({

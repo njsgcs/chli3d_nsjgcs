@@ -18,6 +18,7 @@ export interface IView extends IPropertyChanged, IDisposable {
     get height(): number;
     name: string;
     workplane: Plane;
+    change(scale: number): void;
     update(): void;
     up(): XYZ;
     toImage(): string;

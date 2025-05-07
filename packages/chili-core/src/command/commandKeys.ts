@@ -61,6 +61,7 @@ const COMMAND_KEYS = [
     "workingPlane.toggleDynamic",
     "njsgcs_showDialog",
     "njsgcs_send_to_llm",
+    "njsgcs_changecamera",
 ] as const;
 
 export type CommandKeys = (typeof COMMAND_KEYS)[number];
