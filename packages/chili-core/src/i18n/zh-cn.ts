@@ -224,5 +224,6 @@ export default {
         njsgcs_sidebar: "njsgcs 侧边栏",
         njsgcs_makeview: "参数建模视图",
         njsgcs_changecamera: "切换相机",
+        njsgcs_drawview: "绘制视图",
     },
 } satisfies Locale;

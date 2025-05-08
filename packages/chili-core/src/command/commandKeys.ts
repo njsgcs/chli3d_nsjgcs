@@ -62,6 +62,7 @@ const COMMAND_KEYS = [
     "njsgcs_showDialog",
     "njsgcs_send_to_llm",
     "njsgcs_changecamera",
+    "njsgcs_drawview",
 ] as const;
 
 export type CommandKeys = (typeof COMMAND_KEYS)[number];

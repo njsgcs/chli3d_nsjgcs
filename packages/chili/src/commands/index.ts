@@ -11,6 +11,7 @@ export * from "./importExport";
 export * from "./modify";
 export * from "./multistepCommand";
 export * from "./njsgcs/changeCamera";
+export * from "./njsgcs/drawView";
 export * from "./njsgcs/showDialog";
 export * from "./redo";
 export * from "./undo";
