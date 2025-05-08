@@ -36,7 +36,9 @@ export class njsgcs_ProjectView extends HTMLElement {
         //生成由一个立方体和一个圆柱组成的模型
         //请在200,500,600的位置生成一个10*10*10的正方体
         //生成不常见参数尺寸的一个立方体和一个圆柱体重叠的模型
-        this.user_say_input.value = "帮我分析一下这个物体回复长宽高就行\n";
+        //在起点100,200,0 终点300,200,0的位置创建一条直线
+        //帮我分析一下这个物体回复长宽高就行\n
+        this.user_say_input.value = "在起点100,200,0 终点300,200,0的位置创建一条直线\n";
         this.render();
     }
     private readonly handleActiveViewChanged = (view: IView | undefined) => {
@@ -59,6 +61,16 @@ export class njsgcs_ProjectView extends HTMLElement {
         dz: number,
     ) {
         PubSub.default.pub("njsgcs_makecylinder", normalx, normaly, normalz, ox, oy, oz, radius, dz);
+    }
+    private makeline(
+        startx: number,
+        starty: number,
+        startz: number,
+        endx: number,
+        endy: number,
+        endz: number,
+    ) {
+        PubSub.default.pub("njsgcs_makeline", startx, starty, startz, endx, endy, endz);
     }
     private render() {
         const expander = new Expander("njsgcs_sidebar"); // 创建 Expander
@@ -122,7 +134,8 @@ export class njsgcs_ProjectView extends HTMLElement {
                     textContent: "发送",
                     onclick: async () => {
                         try {
-                            Logger.info("按钮接收到点击事件");
+                            this.resultLabel.textContent = "正在处理对话...";
+
                             // 动态获取输入框的值
                             const body = JSON.stringify({
                                 messages: [
@@ -176,7 +189,7 @@ export class njsgcs_ProjectView extends HTMLElement {
                     onclick: async () => {
                         try {
                             PubSub;
-                            Logger.info("按钮接收到点击事件");
+                            this.resultLabel.textContent = "正在处理对话...";
                             // 动态获取输入框的值
                             let prompt = `请返回纯代码文本，不要返回其他内容
                             不要返回注释和点点点：python
@@ -186,6 +199,8 @@ export class njsgcs_ProjectView extends HTMLElement {
                               this.makebox( 500,300 ,560 ,30, 50, 60)
                               如果在点500,300,560的位置创建一个半径30高度50法向为x轴的圆柱体：
                               this.makecylender(1,0,0, 500,300,560,30, 50)
+                              如果要在起点100,200,0 终点300,200,0的位置创建一条直线：
+                              this.makeline(100,200,0, 300,200,0)
                              `;
 
                             // this.makebox(10,10,10)
@@ -201,6 +216,7 @@ export class njsgcs_ProjectView extends HTMLElement {
                             PubSub.default.pub("gethistory", code);
 
                             eval(code);
+                            this.resultLabel.textContent = "";
                         } catch (error) {
                             Logger.error("Failed to parse response as JSON:", error);
                         }

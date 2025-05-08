@@ -46,6 +46,14 @@ export interface PubSubEventMap {
         radius: number,
         rz: number,
     ) => void;
+    njsgcs_makeline: (
+        startx: number,
+        starty: number,
+        startz: number,
+        endx: number,
+        endy: number,
+        endz: number,
+    ) => void;
     njsgcs_changecamera: () => void;
 
     njsgcs_get_property: (callback: (backresult: string) => void) => void;

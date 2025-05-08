@@ -1,7 +1,7 @@
 // Part of the Chili3d Project, under the AGPL-3.0 License.
 // See LICENSE file in the project root for full license information.
 
-import { BoxNode, CylinderNode } from "chili";
+import { BoxNode, CylinderNode, LineNode } from "chili";
 import {
     Button,
     CommandKeys,
@@ -106,6 +106,21 @@ export class MainWindow implements IWindow {
                     dz,
                 );
                 app.activeView?.document.addNode(cylindernode);
+                app.activeView?.update();
+                app.activeView?.cameraController.fitContent();
+            },
+        );
+        PubSub.default.sub(
+            "njsgcs_makeline",
+            (startx: number, starty: number, startz: number, endx: number, endy: number, endz: number) => {
+                Logger.info("makecylinder!!!!");
+
+                const linenode = new LineNode(
+                    app.activeView?.document!,
+                    new XYZ(startx, starty, startz),
+                    new XYZ(endx, endy, endz),
+                );
+                app.activeView?.document.addNode(linenode);
                 app.activeView?.update();
                 app.activeView?.cameraController.fitContent();
             },
