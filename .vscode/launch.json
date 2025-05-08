@@ -18,7 +18,7 @@
             "name": "Python: 启动 detect.py 服务",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/yolo_detect/detect.py",
+            "program": "${workspaceFolder}/yolo_detect/api.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": []

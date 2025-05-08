@@ -1,6 +1,6 @@
 // Part of the Chili3d Project, under the AGPL-3.0 License.
 // See LICENSE file in the project root for full license information.
-
+import { LineNode } from "chili";
 import {
     EditableShapeNode,
     I18n,
@@ -13,6 +13,7 @@ import {
     VisualNode,
 } from "chili-core";
 
+//import { DxfDocument, Line,DxfWriter, point3d } from '@tarikjabiri/dxf';
 async function importBrep(document: IDocument, file: File) {
     const shape = document.application.shapeFactory.converter.convertFromBrep(await file.text());
     if (!shape.isOk) {
@@ -35,7 +36,7 @@ export class DefaultDataExchange implements IDataExchange {
     }
 
     exportFormats(): string[] {
-        return [".step", ".iges", ".brep"];
+        return [".step", ".iges", ".brep", ".dxf"];
     }
 
     async import(document: IDocument, files: FileList | File[]): Promise<void> {
@@ -77,9 +78,51 @@ export class DefaultDataExchange implements IDataExchange {
 
         const shapes = this.getExportShapes(nodes);
         if (!shapes.length) return;
+        let datashapeResult;
+        if (type === ".dxf") {
+            datashapeResult = this.handleDxfExport(nodes);
+        } else {
+            const shapeResult = await this.convertShapes(type, nodes[0].document, shapes);
+            datashapeResult = this.handleExportResult(shapeResult);
+        }
+        return datashapeResult;
+    }
 
-        const shapeResult = await this.convertShapes(type, nodes[0].document, shapes);
-        return this.handleExportResult(shapeResult);
+    private async handleDxfExport(nodes: VisualNode[]): Promise<string[]> {
+        // 创建一个新的 DXF 文档
+        // const d = new DxfDocument();
+        const lines = [];
+        for (const node of nodes) {
+            if (node instanceof LineNode) {
+                lines.push({
+                    start: {
+                        x: parseFloat(node.start.x.toFixed(1)),
+                        y: parseFloat(node.start.y.toFixed(1)),
+                        z: parseFloat(node.start.z.toFixed(1)),
+                    },
+                    end: {
+                        x: parseFloat(node.end.x.toFixed(1)),
+                        y: parseFloat(node.end.y.toFixed(1)),
+                        z: parseFloat(node.end.z.toFixed(1)),
+                    },
+                });
+            }
+        }
+        const response = await fetch("http://localhost:8737/dxf", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ lines }),
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            throw new Error(`Network response was not ok: ${response.status} - ${errorBody}`);
+        }
+
+        const data = await response.json();
+
+        // 返回分割成行的数组，每行后加上换行符
+        return data["result"].split("\n").map((line: string) => line + "\n");
     }
 
     private validateExportType(type: string): boolean {

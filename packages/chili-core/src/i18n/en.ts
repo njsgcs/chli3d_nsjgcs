@@ -227,5 +227,7 @@ export default {
         njsgcs_makeview: "njsgcs makeview",
         njsgcs_changecamera: "njsgcs changecamera",
         njsgcs_drawview: "njsgcs drawview",
+        viewport: "viewport",
+        sidebar: "sidebar",
     },
 } satisfies Locale;

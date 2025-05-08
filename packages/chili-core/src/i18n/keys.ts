@@ -220,6 +220,8 @@ const I18N_KEYS = [
     "njsgcs_makeview",
     "njsgcs_changecamera",
     "njsgcs_drawview",
+    "viewport",
+    "sidebar",
 ] as const;
 
 export type I18nKeys = (typeof I18N_KEYS)[number];

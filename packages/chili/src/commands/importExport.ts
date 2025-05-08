@@ -71,7 +71,12 @@ export class Export extends CancelableCommand {
                 if (!data) return;
 
                 PubSub.default.pub("showToast", "toast.downloading");
-                download(data, `${nodes[0].name}${format}`);
+                const now = new Date();
+                const timestamp = now
+                    .toISOString()
+                    .replace(/[^0-9]/g, "")
+                    .slice(0, 14);
+                download(data, `output-${timestamp}${format}`);
             },
             "toast.excuting{0}",
             I18n.translate("command.export"),

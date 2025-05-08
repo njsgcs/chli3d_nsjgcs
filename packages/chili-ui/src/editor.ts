@@ -2,7 +2,7 @@
 // See LICENSE file in the project root for full license information.
 
 import { Button, CommandKeys, I18nKeys, IApplication, RibbonTab } from "chili-core";
-import { div } from "./components";
+import { div, Expander } from "./components";
 import style from "./editor.module.css";
 import { njsgcs_MakeView } from "./njsgcs/njsgcs_makeView";
 import { njsgcs_ProjectView } from "./njsgcs/njsgcs_projectView";
@@ -13,7 +13,6 @@ import { Ribbon, RibbonDataContent } from "./ribbon";
 import { RibbonTabData } from "./ribbon/ribbonData";
 import { Statusbar } from "./statusbar";
 import { LayoutViewport } from "./viewport";
-
 let quickCommands: CommandKeys[] = ["doc.save", "doc.saveToFile", "edit.undo", "edit.redo"];
 
 export class Editor extends HTMLElement {
@@ -31,29 +30,31 @@ export class Editor extends HTMLElement {
     }
 
     private render(viewport: LayoutViewport) {
-        this.append(
+        const expander = new Expander("viewport");
+        const sidebarexpander = new Expander("sidebar");
+        expander.append(div({ className: style.viewport }, viewport));
+        sidebarexpander.append(
             div(
-                { className: style.root },
-                new Ribbon(this.ribbonContent),
-                div(
-                    { className: style.content },
-                    div(
-                        { className: style.sidebar },
-                        new ProjectView({ className: style.sidebarItem }),
+                { className: style.sidebar },
+                new ProjectView({ className: style.sidebarItem }),
 
-                        new PropertyView({ className: style.sidebarItem }),
+                new PropertyView({ className: style.sidebarItem }),
 
-                        new njsgcs_ProjectView({
-                            className: style.sidebarItem,
-                        }),
-                        new njsgcs_MakeView({
-                            className: style.sidebarItem,
-                        }),
-                    ),
-                    viewport,
-                ),
-                new Statusbar(style.statusbar),
+                new njsgcs_ProjectView({
+                    className: style.sidebarItem,
+                }),
+                new njsgcs_MakeView({
+                    className: style.sidebarItem,
+                }),
             ),
+        );
+        const horizontalContainer = div({ className: style.horizontalLayout }, expander, sidebarexpander);
+        this.append(
+            new Ribbon(this.ribbonContent),
+
+            horizontalContainer,
+
+            new Statusbar(style.statusbar),
         );
     }
 

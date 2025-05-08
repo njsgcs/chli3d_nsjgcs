@@ -92,7 +92,7 @@ export class njsgcs_ProjectView extends HTMLElement {
                     reader.onload = async () => {
                         try {
                             const base64Data = reader.result?.toString().split(",")[1];
-                            const response = await fetch("http://localhost:8737", {
+                            const response = await fetch("http://localhost:8737/detect", {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify({ image_data: base64Data }),
