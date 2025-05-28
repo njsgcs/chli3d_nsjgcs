@@ -221,6 +221,7 @@ const I18N_KEYS = [
     "njsgcs_changecamera",
     "njsgcs_drawview",
     "viewport",
+    "viewport2",
     "sidebar",
 ] as const;
 

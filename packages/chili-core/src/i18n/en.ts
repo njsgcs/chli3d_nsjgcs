@@ -228,6 +228,7 @@ export default {
         njsgcs_changecamera: "njsgcs changecamera",
         njsgcs_drawview: "njsgcs drawview",
         viewport: "viewport",
+        viewport2: "viewport2",
         sidebar: "sidebar",
     },
 } satisfies Locale;

@@ -4,6 +4,7 @@
 import { Button, CommandKeys, I18nKeys, IApplication, RibbonTab } from "chili-core";
 import { div, Expander } from "./components";
 import style from "./editor.module.css";
+import { njsgcs_drawingView } from "./njsgcs/njsgcs_drawing_view";
 import { njsgcs_MakeView } from "./njsgcs/njsgcs_makeView";
 import { njsgcs_ProjectView } from "./njsgcs/njsgcs_projectView";
 
@@ -31,8 +32,14 @@ export class Editor extends HTMLElement {
 
     private render(viewport: LayoutViewport) {
         const expander = new Expander("viewport");
+        const expander2 = new Expander("viewport");
+        const expander3 = new Expander("viewport2");
+        const drawingView = new njsgcs_drawingView();
         const sidebarexpander = new Expander("sidebar");
-        expander.append(div({ className: style.viewport }, viewport));
+        expander3.append(div({ className: style.viewport }, drawingView));
+        expander2.append(div({ className: style.viewport }, viewport));
+        expander.append(div({ className: style.viewport }, expander2, expander3));
+
         sidebarexpander.append(
             div(
                 { className: style.sidebar },

@@ -10,6 +10,6 @@ export class drawView implements ICommand {
     async execute(app: IApplication): Promise<void> {
         Logger.info("njsqcs.test!!!!!!!!!!!!!!!");
 
-        PubSub.default.pub("njsgcs_drawview");
+        PubSub.default.pub("njsgcs_drawview", app);
     }
 }
