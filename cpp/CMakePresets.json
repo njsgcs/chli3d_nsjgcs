@@ -5,7 +5,7 @@
             "name": "default",
             "generator": "Ninja",
             "hidden": true,
-            "toolchainFile": "build/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+            "toolchainFile": "/home/chen/软件/emscripten/cmake/Modules/Platform/Emscripten.cmake"
         },
         {
             "name": "debug",
@@ -23,6 +23,8 @@
             "binaryDir": "build/target/release",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
+          
+  
             }
         }
     ],

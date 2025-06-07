@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from detect import predict
 from dxf import draw_lines_and_get_dxf
-app = Flask(__name__)
+app = Flask(__name__) 
 CORS(app)  # 启用跨域支持
 @app.route('/detect', methods=['POST'])
 def detect_post():

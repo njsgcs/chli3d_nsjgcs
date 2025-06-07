@@ -1,8 +1,8 @@
 {
     "name": "chili3d",
-    "version": "0.5",
+    "version": "0.5.0",
     "description": "",
-    "author": "仙阁",
+    
     "scripts": {
         "dev": "npx rspack dev",
         "build": "npx rspack build",
