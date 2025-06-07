@@ -1,5 +1,5 @@
 import { GeometryNode, IApplication, Logger, PubSub } from "chili-core";
-
+import { initWasm } from "chili-wasm";
 export class njsgcs_drawingView extends HTMLElement {
     private viewportCanvas2d: HTMLCanvasElement | null = null;
     private app: IApplication | null = null;
@@ -12,6 +12,11 @@ export class njsgcs_drawingView extends HTMLElement {
                 this.removeChild(this.viewportCanvas2d);
                 this.viewportCanvas2d = null;
             }
+           
+            initWasm().then((module) => {
+              
+              Logger.info(module.HelloWorld.sayHello());
+            });
             this.app = app;
             const canvas = this.createCanvas();
             this.appendChild(canvas);

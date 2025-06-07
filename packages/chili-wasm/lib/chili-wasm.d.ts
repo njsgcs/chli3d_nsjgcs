@@ -46,6 +46,9 @@ export type SurfaceBounds = {
 export interface Surface extends ClassHandle {
 }
 
+export interface HelloWorld extends ClassHandle {
+}
+
 export interface Mesher extends ClassHandle {
   mesh(): MeshData;
   edgesMeshPosition(): Array<number>;
@@ -601,6 +604,10 @@ interface EmbindModule {
     projectPoint(_0: Geom_Surface | null, _1: Vector3): Array<Vector3>;
     parameters(_0: Geom_Surface | null, _1: Vector3, _2: number): UV | undefined;
     nearestPoint(_0: Geom_Surface | null, _1: Vector3): PointAndParameter | undefined;
+  };
+  HelloWorld: {
+    sayHello(): string;
+    greet(_0: EmbindString): string;
   };
   Mesher: {
     new(_0: TopoDS_Shape, _1: number): Mesher;

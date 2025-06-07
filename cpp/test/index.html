@@ -89,6 +89,7 @@
             let output = document.getElementById('output');
             let initWasm = await import('../build/target/release/chili-wasm.js');
             let wasm = await initWasm.default();
+           
             test("test face mesh", (expect) => {
                 let location = { x: 0, y: 0, z: 0 };
                 let direction = { x: 0, y: 0, z: 1 };
