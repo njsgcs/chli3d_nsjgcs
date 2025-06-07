@@ -74,6 +74,22 @@ export interface MeshData extends ClassHandle {
   faceMeshData: FaceMeshData;
 }
 
+export interface LineSegmentList extends ClassHandle {
+  size(): number;
+  get(_0: number): LineSegment | undefined;
+  push_back(_0: LineSegment): void;
+  resize(_0: number, _1: LineSegment): void;
+  set(_0: number, _1: LineSegment): boolean;
+}
+
+export interface ProjectionResult extends ClassHandle {
+  visible: LineSegmentList;
+  hidden: LineSegmentList;
+}
+
+export interface ShapeProjection extends ClassHandle {
+}
+
 export interface GeomAbs_ShapeValue<T extends number> {
   value: T;
 }
@@ -368,6 +384,11 @@ export interface gp_Pnt extends ClassHandle {
   readonly z: number;
 }
 
+export type LineSegment = {
+  first: gp_Pnt,
+  second: gp_Pnt
+};
+
 export interface gp_Vec extends ClassHandle {
   readonly x: number;
   readonly y: number;
@@ -615,6 +636,13 @@ interface EmbindModule {
   EdgeMeshData: {};
   FaceMeshData: {};
   MeshData: {};
+  LineSegmentList: {
+    new(): LineSegmentList;
+  };
+  ProjectionResult: {};
+  ShapeProjection: {
+    projection(_0: TopoDS_Shape, _1: gp_Dir): ProjectionResult;
+  };
   GeomAbs_Shape: {GeomAbs_C0: GeomAbs_ShapeValue<0>, GeomAbs_C1: GeomAbs_ShapeValue<2>, GeomAbs_C2: GeomAbs_ShapeValue<4>, GeomAbs_C3: GeomAbs_ShapeValue<5>, GeomAbs_CN: GeomAbs_ShapeValue<6>, GeomAbs_G1: GeomAbs_ShapeValue<1>, GeomAbs_G2: GeomAbs_ShapeValue<3>};
   GeomAbs_JoinType: {GeomAbs_Arc: GeomAbs_JoinTypeValue<0>, GeomAbs_Intersection: GeomAbs_JoinTypeValue<2>, GeomAbs_Tangent: GeomAbs_JoinTypeValue<1>};
   TopAbs_ShapeEnum: {TopAbs_VERTEX: TopAbs_ShapeEnumValue<7>, TopAbs_EDGE: TopAbs_ShapeEnumValue<6>, TopAbs_WIRE: TopAbs_ShapeEnumValue<5>, TopAbs_FACE: TopAbs_ShapeEnumValue<4>, TopAbs_SHELL: TopAbs_ShapeEnumValue<3>, TopAbs_SOLID: TopAbs_ShapeEnumValue<2>, TopAbs_COMPOUND: TopAbs_ShapeEnumValue<0>, TopAbs_COMPSOLID: TopAbs_ShapeEnumValue<1>, TopAbs_SHAPE: TopAbs_ShapeEnumValue<8>};

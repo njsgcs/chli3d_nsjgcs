@@ -24,7 +24,8 @@ import { ShapeResult, TopoDS_Shape } from "../lib/chili-wasm";
 import { OccShapeConverter } from "./converter";
 import { OcctHelper } from "./helper";
 import { OccEdge, OccShape } from "./shape";
-
+export { gp_Pnt } from "../lib/chili-wasm";
+export { OccShape } from "./shape";
 function ensureOccShape(shapes: IShape | IShape[]): TopoDS_Shape[] {
     if (Array.isArray(shapes)) {
         return shapes.map((x) => {
