@@ -2,7 +2,6 @@
     "name": "chili3d",
     "version": "0.5.0",
     "description": "",
-    
     "scripts": {
         "dev": "npx rspack dev",
         "build": "npx rspack build",
@@ -33,6 +32,7 @@
         "jest-environment-jsdom": "^29.7.0",
         "lint-staged": "15.4.3",
         "prettier": "3.5.0",
+        "rspack": "^0.1.1",
         "simple-git-hooks": "^2.11.1",
         "ts-jest": "29.2.5",
         "typescript": "5.7.3",
