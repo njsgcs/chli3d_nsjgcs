@@ -14,7 +14,9 @@ git clone https://gitcode.com/gh_mirrors/oc/OCCT.git
 
 export PATH="/home/njsgcs/emsdk:$PATH"
 export EMSDK="/home/njsgcs/emsdk"
-export EM_CONFIG="$EMSDK/.emscripten"
-export EMSCRIPTEN="$EMSDK/upstream/emscripten"
+
+sudo apt install llvm clang
+
+
 
 ./bootstrap

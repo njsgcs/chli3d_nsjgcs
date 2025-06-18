@@ -31,6 +31,14 @@ async function fixEmscripten() {
 }
 
 const libs = [
+     {
+        name: "occt",
+        url: "https://gitcode.com/gh_mirrors/oc/OCCT.git",
+        tag: "V7_8_1",
+        dir: OCCT_DIR,
+        actions: [],
+        commands: [],
+    },
     {
         name: "emscripten",
         url: "https://gitcode.com/gh_mirrors/em/emscripten.git",
@@ -43,14 +51,7 @@ const libs = [
             `cd ${EMSDK_DIR}/upstream/emscripten && npm i`,
         ],
     },
-    {
-        name: "occt",
-        url: "https://gitcode.com/gh_mirrors/oc/OCCT.git",
-        tag: "V7_8_1",
-        dir: OCCT_DIR,
-        actions: [],
-        commands: [],
-    },
+   
 ];
 
 async function setupLibs() {

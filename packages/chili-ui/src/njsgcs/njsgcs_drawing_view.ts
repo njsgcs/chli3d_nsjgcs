@@ -1,7 +1,7 @@
 import { IApplication, Logger, PubSub, ShapeNode } from "chili-core";
 import { getProjectionEdges, gp_Pnt, LineSegmentList, OccShape, ProjectionResult2 } from "chili-wasm";
 
-
+import { Matrix3, Vector3 } from "three";
 interface Segment {
     first: gp_Pnt;
     second: gp_Pnt;
@@ -51,7 +51,7 @@ export class njsgcs_drawingView extends HTMLElement {
     
         const scaleX = availableWidth / (maxX - minX || 1);
         const scaleY = availableHeight / (maxY - minY || 1);
-        const scale = Math.min(scaleX, scaleY) * 0.9; // 留点边距
+        const scale = Math.min(scaleX, scaleY) * 0.5; // 留点边距
 
     
         // 定义各视图偏移
@@ -60,20 +60,22 @@ export class njsgcs_drawingView extends HTMLElement {
                 name: 'front',
                 segmentsVisible: this.toArray(projection.f_visible),
                 segmentsHidden: this.toArray(projection.f_hidden),
-                offset: { x: margin, y: margin },
+                 matrix : new Matrix3()
+  .scale(scale,1)
+  .translate(margin, margin)
             },
-            { 
-                name: 'side',
-                segmentsVisible: this.toArray(projection.s_visible),
-                segmentsHidden: this.toArray(projection.s_hidden),
-                offset: { x: availableWidth  -maxX*scale , y:  margin  },
-            },
-            {
-                name: 'top',
-                segmentsVisible: this.toArray(projection.t_visible),
-                segmentsHidden: this.toArray(projection.t_hidden),
-                offset: { x:  margin, y: availableHeight-maxY*scale  },
-            },
+            // { 
+            //     name: 'side',
+            //     segmentsVisible: this.toArray(projection.s_visible),
+            //     segmentsHidden: this.toArray(projection.s_hidden),
+            //     offset: { x: availableWidth  -maxX*scale , y:  margin  },
+            // },
+            // {
+            //     name: 'top',
+            //     segmentsVisible: this.toArray(projection.t_visible),
+            //     segmentsHidden: this.toArray(projection.t_hidden),
+            //     offset: { x:  margin, y: availableHeight-maxY*scale  },
+            // },
         ];
     
         // 绘制每个视图
@@ -84,7 +86,7 @@ export class njsgcs_drawingView extends HTMLElement {
                 view.segmentsVisible,
                 false,
                 scale,
-               view.offset,
+               view.matrix,
             );
     
             // 虚线：隐藏线
@@ -93,7 +95,7 @@ export class njsgcs_drawingView extends HTMLElement {
                 view.segmentsHidden,
                 true,
                 scale,
-               view.offset,
+               view.matrix,
             );
         }
     }  
@@ -127,7 +129,7 @@ export class njsgcs_drawingView extends HTMLElement {
         segments: Segment[],
         isHidden: boolean,
         scale: number,
-        offset: { x: number, y: number },
+        matrix: Matrix3,
      
     ) {
         ctx.strokeStyle = isHidden ? "gray" : "black";
@@ -137,14 +139,18 @@ export class njsgcs_drawingView extends HTMLElement {
         for (const segment of segments) {
             if (segment && segment.first && segment.second) {
                 ctx.beginPath();
+                const transformedPoint = new Vector3(segment.first.x, segment.first.y, 0).applyMatrix3(matrix);
+
+
                 ctx.moveTo(
-                    segment.first.x * scale + offset.x,
-                    segment.first.y * scale + offset.y
+                     transformedPoint.x,
+                     transformedPoint.y
                 );
                 Logger.info(segment.first.x * scale , segment.first.y * scale )
+                const transformedPoint2 = new Vector3(segment.second.x, segment.second.y, 0).applyMatrix3(matrix);
                 ctx.lineTo(
-                    segment.second.x * scale + offset.x ,
-                    segment.second.y * scale   + offset.y 
+                       transformedPoint2.x,
+                     transformedPoint2.y
                 );
                 ctx.stroke();
             }
