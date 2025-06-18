@@ -1,3 +1,4 @@
+
 {
     "version": 3,
     "configurePresets": [
@@ -5,7 +6,8 @@
             "name": "default",
             "generator": "Ninja",
             "hidden": true,
-            "toolchainFile": "/home/chen/软件/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+           
+      "toolchainFile": "/home/njsgcs/emscripten/cmake/Modules/Platform/Emscripten.cmake"
         },
         {
             "name": "debug",

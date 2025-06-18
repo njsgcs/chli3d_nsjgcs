@@ -46,8 +46,8 @@ export class njsgcs_drawingView extends HTMLElement {
         // 自动计算缩放和偏移
         const { minX, maxX, minY, maxY } = this.calculateBounds(allSegments);
         const margin = 50;
-        const availableWidth = ctx.canvas.width - 2 * margin;
-        const availableHeight = ctx.canvas.height - 2 * margin;
+        const availableWidth = ctx.canvas.width ;
+        const availableHeight = ctx.canvas.height ;
     
         const scaleX = availableWidth / (maxX - minX || 1);
         const scaleY = availableHeight / (maxY - minY || 1);
@@ -60,20 +60,20 @@ export class njsgcs_drawingView extends HTMLElement {
                 name: 'front',
                 segmentsVisible: this.toArray(projection.f_visible),
                 segmentsHidden: this.toArray(projection.f_hidden),
-                offset: { x: 600, y:300  },
+                offset: { x: margin, y: margin },
             },
-            // {
-            //     name: 'side',
-            //     segmentsVisible: this.toArray(projection.s_visible),
-            //     segmentsHidden: this.toArray(projection.s_hidden),
-            //     offset: { x: 0, y: 0 },
-            // },
-            // {
-            //     name: 'top',
-            //     segmentsVisible: this.toArray(projection.t_visible),
-            //     segmentsHidden: this.toArray(projection.t_hidden),
-            //     offset: { x: availableWidth / 3, y: 0 },
-            // },
+            { 
+                name: 'side',
+                segmentsVisible: this.toArray(projection.s_visible),
+                segmentsHidden: this.toArray(projection.s_hidden),
+                offset: { x: availableWidth  -maxX*scale , y:  margin  },
+            },
+            {
+                name: 'top',
+                segmentsVisible: this.toArray(projection.t_visible),
+                segmentsHidden: this.toArray(projection.t_hidden),
+                offset: { x:  margin, y: availableHeight-maxY*scale  },
+            },
         ];
     
         // 绘制每个视图
@@ -139,12 +139,12 @@ export class njsgcs_drawingView extends HTMLElement {
                 ctx.beginPath();
                 ctx.moveTo(
                     segment.first.x * scale + offset.x,
-                    -segment.first.y * scale + offset.y
+                    segment.first.y * scale + offset.y
                 );
-                Logger.info(segment.first.x * scale , -segment.first.y * scale )
+                Logger.info(segment.first.x * scale , segment.first.y * scale )
                 ctx.lineTo(
                     segment.second.x * scale + offset.x ,
-                    -segment.second.y * scale   + offset.y 
+                    segment.second.y * scale   + offset.y 
                 );
                 ctx.stroke();
             }

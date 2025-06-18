@@ -4,7 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/home/chen/软件/emscripten/system/include/**"
+                "/home/chen/软件/emscripten/system/include/**",
+                "/home/njsgcs/emscripten/system/include/**"
             ],
             "defines": [],
             "compilerPath": "/home/chen/.local/share/swiftly/bin/clang",

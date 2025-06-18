@@ -4,3 +4,9 @@
 
 cnpm i
 pnpm install --save-dev rspack @rspack/cli
+
+git clone https://gitcode.com/gh_mirrors/em/emscripten.git
+
+git clone https://gitcode.com/gh_mirrors/em/emsdk.git
+
+git clone https://gitcode.com/gh_mirrors/oc/OCCT.git
