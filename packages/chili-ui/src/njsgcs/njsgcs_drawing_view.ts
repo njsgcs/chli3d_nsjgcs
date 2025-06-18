@@ -52,8 +52,7 @@ export class njsgcs_drawingView extends HTMLElement {
         const scaleX = availableWidth / (maxX - minX || 1);
         const scaleY = availableHeight / (maxY - minY || 1);
         const scale = Math.min(scaleX, scaleY) * 0.9; // 留点边距
-        const offsetX = ctx.canvas.width / 2;
-        const offsetY = ctx.canvas.height / 2;
+
     
         // 定义各视图偏移
         const views = [
@@ -61,20 +60,20 @@ export class njsgcs_drawingView extends HTMLElement {
                 name: 'front',
                 segmentsVisible: this.toArray(projection.f_visible),
                 segmentsHidden: this.toArray(projection.f_hidden),
-                offset: { x: -availableWidth / 3, y: 0 },
+                offset: { x: 600, y:300  },
             },
-            {
-                name: 'side',
-                segmentsVisible: this.toArray(projection.s_visible),
-                segmentsHidden: this.toArray(projection.s_hidden),
-                offset: { x: 0, y: 0 },
-            },
-            {
-                name: 'top',
-                segmentsVisible: this.toArray(projection.t_visible),
-                segmentsHidden: this.toArray(projection.t_hidden),
-                offset: { x: availableWidth / 3, y: 0 },
-            },
+            // {
+            //     name: 'side',
+            //     segmentsVisible: this.toArray(projection.s_visible),
+            //     segmentsHidden: this.toArray(projection.s_hidden),
+            //     offset: { x: 0, y: 0 },
+            // },
+            // {
+            //     name: 'top',
+            //     segmentsVisible: this.toArray(projection.t_visible),
+            //     segmentsHidden: this.toArray(projection.t_hidden),
+            //     offset: { x: availableWidth / 3, y: 0 },
+            // },
         ];
     
         // 绘制每个视图
@@ -85,8 +84,7 @@ export class njsgcs_drawingView extends HTMLElement {
                 view.segmentsVisible,
                 false,
                 scale,
-                offsetX + view.offset.x,
-                offsetY + view.offset.y
+               view.offset,
             );
     
             // 虚线：隐藏线
@@ -95,8 +93,7 @@ export class njsgcs_drawingView extends HTMLElement {
                 view.segmentsHidden,
                 true,
                 scale,
-                offsetX + view.offset.x,
-                offsetY + view.offset.y
+               view.offset,
             );
         }
     }  
@@ -130,8 +127,8 @@ export class njsgcs_drawingView extends HTMLElement {
         segments: Segment[],
         isHidden: boolean,
         scale: number,
-        offsetX: number,
-        offsetY: number
+        offset: { x: number, y: number },
+     
     ) {
         ctx.strokeStyle = isHidden ? "gray" : "black";
         ctx.lineWidth = isHidden ? 1 : 2;
@@ -141,12 +138,13 @@ export class njsgcs_drawingView extends HTMLElement {
             if (segment && segment.first && segment.second) {
                 ctx.beginPath();
                 ctx.moveTo(
-                    segment.first.x * scale + offsetX,
-                    -segment.first.y * scale + offsetY
+                    segment.first.x * scale + offset.x,
+                    -segment.first.y * scale + offset.y
                 );
+                Logger.info(segment.first.x * scale , -segment.first.y * scale )
                 ctx.lineTo(
-                    segment.second.x * scale + offsetX,
-                    -segment.second.y * scale + offsetY
+                    segment.second.x * scale + offset.x ,
+                    -segment.second.y * scale   + offset.y 
                 );
                 ctx.stroke();
             }
@@ -165,7 +163,7 @@ export class njsgcs_drawingView extends HTMLElement {
     private createCanvas(): HTMLCanvasElement {
         if (!this.viewportCanvas2d) {
             this.viewportCanvas2d = document.createElement("canvas");
-            this.viewportCanvas2d.width = 900;
+            this.viewportCanvas2d.width = 1200;
             this.viewportCanvas2d.height = 600;
             this.viewportCanvas2d.style.border = "1px solid #000";
 

@@ -27,7 +27,15 @@
             "name": "debug",
             "type": "msedge",
             "request": "launch",
-            "url": "http://localhost:8080/"
+            "url": "http://localhost:8080/",
+            "windows": {
+             "postDebugTask": "Kill Vite Dev Server"
+            },         "linux":{
+
+                "postDebugTask": "Kill Vite Dev Server2",
+        
+            }
+             
         },
         {
             "type": "node",
@@ -35,7 +43,12 @@
             "name": "Debug Rspack",
             "runtimeExecutable": "npx",
             "args": ["rspack", "dev", "--config", "${workspaceFolder}/rspack.config.js"],
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "linux":{
+
+                "postDebugTask": "Kill Vite Dev Server3",
+        
+            }
         }
     ],
     "compounds": [
