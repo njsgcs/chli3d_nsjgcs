@@ -33,7 +33,7 @@ async function fixEmscripten() {
 const libs = [
     {
         name: "emscripten",
-        url: "https://github.com/emscripten-core/emsdk.git",
+        url: "https://gitcode.com/gh_mirrors/em/emscripten.git",
         tag: "4.0.4",
         dir: EMSDK_DIR,
         actions: [fixEmscripten],
@@ -45,7 +45,7 @@ const libs = [
     },
     {
         name: "occt",
-        url: "https://github.com/Open-Cascade-SAS/OCCT.git",
+        url: "https://gitcode.com/gh_mirrors/oc/OCCT.git",
         tag: "V7_8_1",
         dir: OCCT_DIR,
         actions: [],

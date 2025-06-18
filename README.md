@@ -10,3 +10,11 @@ git clone https://gitcode.com/gh_mirrors/em/emscripten.git
 git clone https://gitcode.com/gh_mirrors/em/emsdk.git
 
 git clone https://gitcode.com/gh_mirrors/oc/OCCT.git
+
+
+export PATH="/home/njsgcs/emsdk:$PATH"
+export EMSDK="/home/njsgcs/emsdk"
+export EM_CONFIG="$EMSDK/.emscripten"
+export EMSCRIPTEN="$EMSDK/upstream/emscripten"
+
+./bootstrap
