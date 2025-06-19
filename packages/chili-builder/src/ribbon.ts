@@ -108,7 +108,7 @@ export const DefaultRibbon: RibbonTab[] = [
             },
             {
                 groupName: "ribbon.group.other",
-                items: ["test.performace", "njsgcs_changecamera", "njsgcs_drawview"],
+                items: ["test.performace"],
             },
         ],
     },

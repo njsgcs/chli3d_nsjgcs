@@ -1,4 +1,4 @@
-import { command, IApplication, ICommand, Logger, PubSub } from "chili-core";
+import { command, IApplication, ICommand, Logger } from "chili-core";
 // 定义类并实现 ICommand 接口
 @command({
     name: "njsgcs_drawview",
@@ -10,6 +10,5 @@ export class drawView implements ICommand {
     async execute(app: IApplication): Promise<void> {
         Logger.info("njsqcs.test!!!!!!!!!!!!!!!");
 
-        PubSub.default.pub("njsgcs_drawview", app);
     }
 }

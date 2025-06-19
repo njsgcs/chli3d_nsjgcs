@@ -1,6 +1,5 @@
 // Part of the Chili3d Project, under the AGPL-3.0 License.
 // See LICENSE file in the project root for full license information.
-import { IApplication } from "chili-core";
 import { CommandKeys, ICommand } from "../command";
 import { IDocument } from "../document";
 import { I18nKeys } from "../i18n";
@@ -28,6 +27,7 @@ export interface PubSubEventMap {
     executeCommand: (commandName: CommandKeys) => void;
     modelUpdate: (model: INode) => void;
     njsgcs_showDialog: () => void;
+    njsgcs_exportdxf: () => void;
     njsgcs_makebox: (
         ox: number,
         oy: number,
@@ -55,7 +55,8 @@ export interface PubSubEventMap {
         endz: number,
     ) => void;
     njsgcs_changecamera: () => void;
-    njsgcs_drawview: (app: IApplication) => void;
+    njsgcs_3drebuild: (document: Document) => void;
+    njsgcs_drawview: (document: IDocument) => void;
     njsgcs_get_property: (callback: (backresult: string) => void) => void;
     openCommandContext: (command: ICommand) => void;
     parentVisibleChanged: (model: INode) => void;

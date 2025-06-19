@@ -245,6 +245,48 @@ export class njsgcs_ProjectView extends HTMLElement {
                         }
                     },
                 }),
+            ), div(
+                { className: style.buttons },
+                button({
+                    textContent: "生成工程图",
+                    onclick: async () => {
+                        try {
+                             PubSub.default.pub("njsgcs_drawview", this._activeDocument! );
+                        } catch (error) {
+                            Logger.error("Failed to parse response as JSON:", error);
+                        }
+                    },
+                }),
+            ),
+                 div(
+                { className: style.buttons },
+                button({
+                    textContent: "导出工程图dxf",
+                    onclick: async () => {
+                        try {
+                            
+                            PubSub.default.pub("njsgcs_exportdxf");
+                          
+                        } catch (error) {
+                            Logger.error("Failed to parse response as JSON:", error);
+                        }
+                    },
+                }),
+            ),
+              div(
+                { className: style.buttons },
+                button({
+                    textContent: "dxf三维重建",
+                    onclick: async () => {
+                        try {
+                            Logger.info("dxf三维重建按钮接收到点击事件");
+                            PubSub.default.pub("njsgcs_3drebuild",  document);
+                          
+                        } catch (error) {
+                            Logger.error("Failed to parse response as JSON:", error);
+                        }
+                    },
+                }),
             ),
             div({ className: style.result }, this.resultLabel),
         );

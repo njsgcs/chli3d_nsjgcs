@@ -14,10 +14,10 @@ export function getProjectionEdges(
    
 ): { f_visible: LineSegmentList; f_hidden: LineSegmentList,s_visible: LineSegmentList; s_hidden: LineSegmentList,t_visible: LineSegmentList; t_hidden: LineSegmentList} {
     console.info("test1");
-    const f_result = wasm.ShapeProjection.projection(shape, new wasm.gp_Dir(0, 1, 0));
+    const f_result = wasm.ShapeProjection.projection(shape, new wasm.gp_Dir(0, -1, 0));
     console.info("first:"+f_result.visible.get(0)?.first);
-    const s_result = wasm.ShapeProjection.projection(shape, new wasm.gp_Dir( 1,0, 0));
-    const t_result = wasm.ShapeProjection.projection(shape, new wasm.gp_Dir( 0, 0,1));
+    const s_result = wasm.ShapeProjection.projection(shape, new wasm.gp_Dir(-1,0, 0));
+    const t_result = wasm.ShapeProjection.projection(shape, new wasm.gp_Dir( 0, 0,-1));
    
     return {
         f_visible: f_result.visible,
