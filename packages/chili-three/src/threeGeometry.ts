@@ -22,7 +22,7 @@ import { ThreeVisualObject } from "./threeVisualObject";
 
 export class ThreeGeometry extends ThreeVisualObject implements IVisualGeometry {
     private _faceMaterial: Material;
-    private _edgeMaterial = new LineMaterial({
+     private _edgeMaterial = new LineMaterial({
         linewidth: 1,
         color: VisualConfig.defaultEdgeColor,
         side: DoubleSide,
@@ -39,6 +39,7 @@ export class ThreeGeometry extends ThreeVisualObject implements IVisualGeometry 
     ) {
         super(geometryNode);
         this._faceMaterial = context.getMaterial(geometryNode.materialId);
+      
         this.generateShape();
         geometryNode.onPropertyChanged(this.handleGeometryPropertyChanged);
     }

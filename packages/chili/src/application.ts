@@ -22,7 +22,6 @@ import {
 } from "chili-core";
 import { Document } from "./document";
 import { importFiles } from "./utils";
-
 let app: Application | undefined;
 
 export interface ApplicationOptions {
@@ -160,7 +159,13 @@ export class Application implements IApplication {
         const document = new Document(this, name);
         const lightGray = new Material(document, "LightGray", 0xdedede);
         const deepGray = new Material(document, "DeepGray", 0x898989);
-        document.materials.push(lightGray, deepGray);
+    
+        const redMaterial = new Material(document, "Red", 0xff0000,"1");  
+const greenMaterial = new Material(document, "Green", 0x00ff00,"2");  
+const blueMaterial = new Material(document, "Blue", 0x0000ff,"3");  
+        const yellowMaterial = new Material(document, "Yellow", 0xffff00, "4"); // 黄色
+const cyanMaterial = new Material(document, "Cyan", 0x00ffff, "5");     // 青色
+document.materials.push(lightGray, deepGray,redMaterial, greenMaterial, blueMaterial,yellowMaterial, cyanMaterial);
         await this.createActiveView(document);
         return document;
     }

@@ -70,7 +70,7 @@ export class njsgcs_ProjectView extends HTMLElement {
         endy: number,
         endz: number,
     ) {
-        PubSub.default.pub("njsgcs_makeline", startx, starty, startz, endx, endy, endz);
+        PubSub.default.pub("njsgcs_makeline", startx, starty, startz, endx, endy, endz,0);
     }
     private render() {
         const expander = new Expander("njsgcs_sidebar"); // 创建 Expander

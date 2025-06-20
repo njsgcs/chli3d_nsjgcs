@@ -13,7 +13,7 @@ import {
     Plane,
     PubSub,
     RibbonTab,
-    XYZ,
+    XYZ
 } from "chili-core";
 import { Dialog } from "./dialog";
 import { Editor } from "./editor";
@@ -49,6 +49,8 @@ export class MainWindow implements IWindow {
 
     private _initSubs(app: IApplication) {
         const displayHome = debounce(this.displayHome, 100);
+       
+       
         PubSub.default.sub("showToast", Toast.info);
         PubSub.default.sub("displayError", Toast.error);
         PubSub.default.sub("showDialog", Dialog.show);
@@ -110,16 +112,23 @@ export class MainWindow implements IWindow {
                 app.activeView?.cameraController.fitContent();
             },
         );
+      
         PubSub.default.sub(
             "njsgcs_makeline",
-            (startx: number, starty: number, startz: number, endx: number, endy: number, endz: number) => {
-                Logger.info("makecylinder!!!!");
+            (startx: number, starty: number, startz: number, endx: number, endy: number, endz: number,color:number) => {
+                
 
                 const linenode = new LineNode(
                     app.activeView?.document!,
                     new XYZ(startx, starty, startz),
                     new XYZ(endx, endy, endz),
                 );
+              const materialIds = app.activeView?.document!.materials.map(material => material.id);  
+console.log("所有材质ID:", materialIds);
+          
+         if(color<6)linenode.materialId =  color.toString();  
+           
+               
                 app.activeView?.document.addNode(linenode);
                 app.activeView?.update();
                 app.activeView?.cameraController.fitContent();

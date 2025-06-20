@@ -20,3 +20,6 @@ sudo apt install llvm clang
 
 
 ./bootstrap
+
+
+https://deepwiki.com/xiangechen/chili3d

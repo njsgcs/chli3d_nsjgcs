@@ -2,6 +2,7 @@ import { DxfWriter, point3d } from '@tarikjabiri/dxf';
 import { IDocument, Logger, PubSub, ShapeNode } from "chili-core";
 import { getProjectionEdges, gp_Pnt, LineSegmentList, OccShape, ProjectionResult2 } from "chili-wasm";
 import { Matrix3, Vector3 } from "three";
+
 import { rebuild3D } from "./njsgcs_3drebuild";
 interface Segment {
     first: gp_Pnt;
@@ -26,7 +27,7 @@ export class njsgcs_drawingView extends HTMLElement {
             this.activeDocument = activeDocument;
            
 
-            
+         
             const canvas = this.createCanvas();
             this.appendChild(canvas);
         });

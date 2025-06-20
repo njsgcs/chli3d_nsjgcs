@@ -53,6 +53,7 @@ export interface PubSubEventMap {
         endx: number,
         endy: number,
         endz: number,
+        materialId:number,
     ) => void;
     njsgcs_changecamera: () => void;
     njsgcs_3drebuild: (document: Document) => void;
