@@ -10,6 +10,7 @@ import {
     IApplication,
     IWindow,
     Logger,
+    Material,
     Plane,
     PubSub,
     RibbonTab,
@@ -49,7 +50,12 @@ export class MainWindow implements IWindow {
 
     private _initSubs(app: IApplication) {
         const displayHome = debounce(this.displayHome, 100);
-       
+        const redMaterial = new Material( app.activeView?.document!, "Red", 0xff0000,"1");  
+       const greenMaterial = new Material(app.activeView?.document!, "Green", 0x00ff00,"2");  
+       const blueMaterial = new Material(app.activeView?.document!, "Blue", 0x0000ff,"3");  
+               const yellowMaterial = new Material(app.activeView?.document!, "Yellow", 0xffff00, "4"); // 黄色
+       const cyanMaterial = new Material(app.activeView?.document!, "Cyan", 0x00ffff, "5");     // 青色
+        app.activeView?.document.materials.push(redMaterial, greenMaterial, blueMaterial,yellowMaterial, cyanMaterial);
        
         PubSub.default.sub("showToast", Toast.info);
         PubSub.default.sub("displayError", Toast.error);

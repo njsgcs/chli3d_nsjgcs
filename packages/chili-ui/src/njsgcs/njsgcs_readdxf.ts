@@ -2,6 +2,8 @@ import { Logger, PubSub } from "chili-core";
 import DxfParser, { ILineEntity } from 'dxf-parser';
 
 export function readdxf(document: Document) {
+
+          
   const fileInput = document.createElement("input");
   fileInput.type = "file";
   fileInput.accept = ".dxf"; // 修改为正确的文件类型
