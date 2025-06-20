@@ -4,6 +4,8 @@ import { IDocument, IView, Logger, PubSub } from "chili-core";
 
 import { button, div, Expander, textarea } from "../components";
 import style from "../property/propertyView.module.css";
+import { rebuild3D } from "./njsgcs_3drebuild";
+import { readdxf } from "./njsgcs_readdxf";
 import { send_to_llm } from "./njsgcs_send_to_llm";
 export class njsgcs_ProjectView extends HTMLElement {
     private _activeDocument: IDocument | undefined;
@@ -264,8 +266,23 @@ export class njsgcs_ProjectView extends HTMLElement {
                     textContent: "导出工程图dxf",
                     onclick: async () => {
                         try {
-                            
+                           
                             PubSub.default.pub("njsgcs_exportdxf");
+                          
+                        } catch (error) {
+                            Logger.error("Failed to parse response as JSON:", error);
+                        }
+                    },
+                }),
+            ),
+                div(
+                { className: style.buttons },
+                button({
+                    textContent: "读取DXF文件",
+                    onclick: async () => {
+                        try {
+                 readdxf( document);
+                      
                           
                         } catch (error) {
                             Logger.error("Failed to parse response as JSON:", error);
@@ -280,7 +297,7 @@ export class njsgcs_ProjectView extends HTMLElement {
                     onclick: async () => {
                         try {
                             Logger.info("dxf三维重建按钮接收到点击事件");
-                            PubSub.default.pub("njsgcs_3drebuild",  document);
+                            rebuild3D(document);
                           
                         } catch (error) {
                             Logger.error("Failed to parse response as JSON:", error);

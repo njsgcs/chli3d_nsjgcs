@@ -3,7 +3,6 @@ import { IDocument, Logger, PubSub, ShapeNode } from "chili-core";
 import { getProjectionEdges, gp_Pnt, LineSegmentList, OccShape, ProjectionResult2 } from "chili-wasm";
 import { Matrix3, Vector3 } from "three";
 
-import { rebuild3D } from "./njsgcs_3drebuild";
 interface Segment {
     first: gp_Pnt;
     second: gp_Pnt;
@@ -35,10 +34,7 @@ export class njsgcs_drawingView extends HTMLElement {
             Logger.info("njsgcs_export_dxf event triggered");
             this.export_dxf();
         });
-        PubSub.default.sub("njsgcs_3drebuild", (activeDocument: Document) => {
-    Logger.info("njsgcs_3drebuild 事件接收到");
-    rebuild3D(activeDocument)});
-
+       
     }
     private export_dxf() {
    // 如果是浏览器环境
@@ -100,17 +96,17 @@ const CommonEntityOptions = {
         const scale = 0.5; // 留点边距
 const swapXYMatrix = new Matrix3().set(
   0, 1, 0,
-  1, 0, 0,
+  -1, 0, 0,
   0, 0, 1
 );
 const swapXYMatrix2 = new Matrix3().set(
   0, 1, 0,
-  1, 0, 0,
+  -1, 0, 0,
   0, 0, 1
 );
 const swapXYMatrix3 = new Matrix3().set(
   -1, 0, 0,
-  0,1,  0,
+  0,-1,  0,
   0, 0, 1
 );
 
@@ -126,7 +122,7 @@ const swapXYMatrix3 = new Matrix3().set(
   
   .scale(scale, scale)
   .multiply(swapXYMatrix) 
-  .translate(margin, availableHeight-margin)
+  .translate(margin, margin)
                    
             },
             { 
@@ -137,7 +133,7 @@ const swapXYMatrix3 = new Matrix3().set(
   
   .scale(scale, scale)
   .multiply(swapXYMatrix2) 
-  .translate(availableWidth-margin, availableHeight-margin)
+  .translate(availableWidth-margin, margin)
                    
          
             },
@@ -149,7 +145,7 @@ const swapXYMatrix3 = new Matrix3().set(
   
   .scale(scale, scale)
   .multiply(swapXYMatrix3) 
-                   .translate(margin,margin)
+                   .translate(margin,availableHeight-margin)
          
             
             },
@@ -188,6 +184,7 @@ const swapXYMatrix3 = new Matrix3().set(
         ctx.strokeStyle = isHidden ? "gray" : "black";
         ctx.lineWidth = isHidden ? 1 : 2;
         ctx.setLineDash(isHidden ? [5, 5] : []);
+          ctx.setTransform(1, 0, 0, -1, 0, ctx.canvas.height);
     Logger.info(matrix)
         for (const segment of segments) {
             if (segment && segment.first && segment.second) {
