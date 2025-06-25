@@ -133,7 +133,7 @@ export function rebuild3D(document: Document) {
 
                 // 执行聚类
                 const clusters = clusterLines(inputlines, 5);
-                const lines3d:[number,number,number,number,number,number][]=[]
+                const lines3d:[number,number,number,number,number,number,number][]=[]
                 const { mostMinX, mostMinY } = getMostFrequentMinXY(clusters);
                 const mostFrequentClusters = clusters.filter(cluster => {
     return cluster.min_x === mostMinX.value && cluster.min_y === mostMinY.value;
@@ -156,47 +156,64 @@ const leftclusters = clusters.filter(cluster => {
                const rightcluster= rightclusters[0];
                const bottomcluster= bottomclusters[0];
                const leftcluster= leftclusters[0];
-              mostFrequentCluster.lines.forEach(line => {
-                const [x1, y1, x2, y2] = line;
-             const seen = new Set<string>(); // 用于记录已经添加过的线段
-
-function addUniqueLine(x1: number, y1: number, z1: number, x2: number, y2: number, z2: number) {
+                  const seen = new Set<string>(); // 用于记录已经添加过的线段
+               function addUniqueLine(x1: number, y1: number, z1: number, x2: number, y2: number, z2: number,color:number) {
     const key = `${x1},${y1},${z1},${x2},${y2},${z2}`;
     if (!seen.has(key)) {
         seen.add(key);
-        lines3d.push([x1, y1, z1, x2, y2, z2]);
+        lines3d.push([x1, y1, z1, x2, y2, z2,color]);
+    }
+} 
+const clusterMinY = topcluauster.min_y;
+
+// 构建点存在性查询的 Map
+const pointToLinesMap = new Map<string, boolean>();
+topcluauster.lines.forEach(([tx1, ty1, tx2, ty2]) => {
+    pointToLinesMap.set(`${tx1},${ty1}`, true);
+    pointToLinesMap.set(`${tx2},${ty2}`, true);
+});
+
+// 判断某点是否存在于 topcluauster 中
+function isPointInTopCluster(x: number, y: number): boolean {
+    return pointToLinesMap.has(`${x},${y}`);
+}
+
+// 主处理逻辑
+for (const [x1, y1, x2, y2] of mostFrequentCluster.lines) {
+    for (const [tx1, ty1, tx2, ty2] of topcluauster.lines) {
+        // 判断 (x1, ty1) 和 (x2, ty2) 是否在 topcluauster 的线段中
+        const p1Exists = isPointInTopCluster(x1, ty1);
+        const p2Exists = isPointInTopCluster(x2, ty2);
+                
+                const offset1 = ty1 - clusterMinY;
+            const offset2 = ty2 - clusterMinY;
+        if (p1Exists && p2Exists&&x1==tx1&&x2==tx2) {
+             
+           
+            
+            addUniqueLine(x1, y1, offset1, x2, y2, offset1, 1);
+            addUniqueLine(x1, y1, offset2, x2, y2, offset2, 1);
+}
+         
+         if (ty1 !== ty2 && (x1 === tx1 && tx1 === tx2 )) {
+                         
+         
+                addUniqueLine(x1, y1, offset1, x1, y1, offset2, 1);
+               
+            }
+                     if (ty1 !== ty2 && ( x2 === tx1 && tx1 === tx2)) {
+                   
+             addUniqueLine(x2, y2, offset1, x2, y2, offset2, 1);
+                     }
     }
 }
-               
-               topcluauster.lines.forEach(line => {
-                const [tx1, ty1, tx2, ty2] = line;
-                const clusterminy=topcluauster.min_y;
-            if (tx1 <x1 && tx2 > x2) {
-     addUniqueLine(x1, y1, ty1-clusterminy, x2, y2, ty1-clusterminy);
-addUniqueLine(x1, y1, ty2-clusterminy, x2, y2, ty2-clusterminy);
-
-
-            }
-             rightcluster.lines.forEach(line => {
-                const [rx1, ry1, rx2, ry2] = line;
-                const clusterminx=rightcluster.min_x;
-                if (ry1 <y1 && ry2 > y2) {
-     addUniqueLine(x1, y1, rx1-clusterminx, x2, y2, rx1-clusterminx);
-addUniqueLine(x1, y1, rx2-clusterminx, x2, y2, rx2-clusterminx);
-
-                }
-             });
-         
-
-              });
-                
-              });
 Logger.info(`lines3d completed with ${lines3d.length} lines3d`);
                  lines3d.forEach(line => {
 
                 PubSub.default.pub("njsgcs_makeline", line[0], line[1],  line[2], line[3], line[4], line[5],1); 
              })
-                //let i =0;
+             ///////////////////////////////
+                // let i =0;
                 // // 发送每个线段给 njsgcs_makeline
                 // clusters.forEach(cluster => {
                 //     i++;
@@ -205,7 +222,7 @@ Logger.info(`lines3d completed with ${lines3d.length} lines3d`);
                 //         PubSub.default.pub("njsgcs_makeline", x1, y1, 0, x2, y2, 0,i); // z=0 假设为俯视图
                 //     });
                 // });
-
+  ///////////////////////////////
                 Logger.info(`Clustering completed with ${clusters.length} clusters`);
             };
 

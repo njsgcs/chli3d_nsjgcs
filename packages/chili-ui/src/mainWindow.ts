@@ -129,10 +129,10 @@ export class MainWindow implements IWindow {
                     new XYZ(startx, starty, startz),
                     new XYZ(endx, endy, endz),
                 );
-              const materialIds = app.activeView?.document!.materials.map(material => material.id);  
-console.log("所有材质ID:", materialIds);
+//               const materialIds = app.activeView?.document!.materials.map(material => material.id);  
+// console.log("所有材质ID:", materialIds);
           
-         if(color<6)linenode.materialId =  color.toString();  
+         //if(color<6)linenode.materialId =  color.toString();  
            
                
                 app.activeView?.document.addNode(linenode);

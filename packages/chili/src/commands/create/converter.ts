@@ -41,7 +41,7 @@ abstract class ConvertCommand extends CancelableCommand {
                 PubSub.default.pub("showToast", "toast.success");
             }
 
-            models.forEach((x) => x.parent?.remove(x));
+           // models.forEach((x) => x.parent?.remove(x));
         });
     }
 
