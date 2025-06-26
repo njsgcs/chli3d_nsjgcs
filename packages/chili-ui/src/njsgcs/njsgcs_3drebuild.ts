@@ -187,12 +187,22 @@ for (const [x1, y1, x2, y2] of mostFrequentCluster.lines) {
                 
                 const offset1 = ty1 - clusterMinY;
             const offset2 = ty2 - clusterMinY;
-        if (p1Exists && p2Exists&&x1==tx1&&x2==tx2) {
+        if (p1Exists && p2Exists) {
              
            
-            
-            addUniqueLine(x1, y1, offset1, x2, y2, offset1, 1);
-            addUniqueLine(x1, y1, offset2, x2, y2, offset2, 1);
+            if(x1==x2&&x1==tx1){
+
+                  addUniqueLine(x1, y1, offset1, x2, y2, offset1, 1);
+        
+            }
+            else if(x1==x2&&x1==tx2){
+                  addUniqueLine(x1, y1, offset2, x2, y2, offset2, 1);
+            }
+            else if(x1==tx1&&x2==tx2){ addUniqueLine(x1, y1, offset1, x2, y2, offset2, 1);
+
+               
+            }
+          
 }
          
          if (ty1 !== ty2 && (x1 === tx1 && tx1 === tx2 )) {
