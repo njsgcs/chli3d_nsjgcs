@@ -6,6 +6,7 @@ export * from "./circle";
 export * from "./cone";
 export * from "./cylinder";
 export * from "./ellipse";
+export * from "./face";
 export * from "./line";
 export * from "./polygon";
 export * from "./prism";
@@ -14,3 +15,4 @@ export * from "./rect";
 export * from "./revolve";
 export * from "./sphere";
 export * from "./sweep";
+

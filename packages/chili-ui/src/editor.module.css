@@ -1,5 +1,5 @@
 .viewport {
-    width: 1580px;
+    width: 1500px;
     height: 750px;
 }
 
@@ -9,5 +9,7 @@
 }
 
 .sidebar {
-    flex: 0 0 300px; /* 根据需要调整宽度 */
+    flex: 0 0 800px; /* 根据需要调整高度 */
+   overflow: auto;
+  
 }

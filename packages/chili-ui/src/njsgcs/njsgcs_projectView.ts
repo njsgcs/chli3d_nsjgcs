@@ -5,6 +5,7 @@ import { IDocument, IView, Logger, PubSub } from "chili-core";
 import { button, div, Expander, textarea } from "../components";
 import style from "../property/propertyView.module.css";
 import { rebuild3D } from "./njsgcs_3drebuild";
+import { face_rebuild } from "./njsgcs_facerebuild";
 import { readdxf } from "./njsgcs_readdxf";
 import { send_to_llm } from "./njsgcs_send_to_llm";
 export class njsgcs_ProjectView extends HTMLElement {
@@ -311,7 +312,7 @@ export class njsgcs_ProjectView extends HTMLElement {
                     textContent: "生成壳体",
                     onclick: async () => {
                         try {
-                           
+                           face_rebuild (this._activeDocument!);
                           
                         } catch (error) {
                             Logger.error("Failed to parse response as JSON:", error);
