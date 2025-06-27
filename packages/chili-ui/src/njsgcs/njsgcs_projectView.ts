@@ -255,7 +255,8 @@ export class njsgcs_ProjectView extends HTMLElement {
                     onclick: async () => {
                         try {
                              PubSub.default.pub("njsgcs_drawview", this._activeDocument! );
-                        } catch (error) {
+                     
+                            } catch (error) {
                             Logger.error("Failed to parse response as JSON:", error);
                         }
                     },

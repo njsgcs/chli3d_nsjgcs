@@ -1,7 +1,7 @@
 // Part of the Chili3d Project, under the AGPL-3.0 License.
 // See LICENSE file in the project root for full license information.
 
-import { Button, CommandKeys, I18nKeys, IApplication, RibbonTab } from "chili-core";
+import { Button, CommandKeys, I18nKeys, IApplication, PubSub, RibbonTab } from "chili-core";
 import { div, Expander } from "./components";
 import style from "./editor.module.css";
 import { njsgcs_drawingView } from "./njsgcs/njsgcs_drawing_view";
@@ -36,6 +36,11 @@ export class Editor extends HTMLElement {
         const expander3 = new Expander("viewport2");
         const drawingView = new njsgcs_drawingView();
         const sidebarexpander = new Expander("sidebar");
+        PubSub.default.sub("expenddrawview", () => {
+expander3.ExpanderClick(true);
+expander2.ExpanderClick(false);
+
+        });
         expander3.append(div({ className: style.viewport }, drawingView));
         expander2.append(div({ className: style.viewport }, viewport));
         expander.append(div({ className: style.viewport }, expander2, expander3));

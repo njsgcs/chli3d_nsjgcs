@@ -48,7 +48,12 @@ export class Expander extends HTMLElement {
     private getExpanderIcon() {
         return this._isExpanded ? "icon-angle-down" : "icon-angle-right";
     }
-
+    public  ExpanderClick (open: boolean) {
+      
+        this._isExpanded = open;
+        setSVGIcon(this.expanderIcon, this.getExpanderIcon());
+        this.contenxtPanel.classList.toggle(style.hidden, !this._isExpanded);
+    };
     private readonly _handleExpanderClick = (e: MouseEvent) => {
         e.stopPropagation();
         this._isExpanded = !this._isExpanded;

@@ -55,6 +55,7 @@ export interface PubSubEventMap {
         endz: number,
         materialId:number,
     ) => void;
+    expenddrawview: () => void;
     njsgcs_changecamera: () => void;
     njsgcs_3drebuild: (document: Document) => void;
     njsgcs_drawview: (document: IDocument) => void;
