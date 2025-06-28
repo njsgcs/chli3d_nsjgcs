@@ -1,7 +1,7 @@
 // Part of the Chili3d Project, under the AGPL-3.0 License.
 // See LICENSE file in the project root for full license information.
 
-import { BoxNode, CylinderNode, LineNode } from "chili";
+import { ArcNode, BoxNode, CylinderNode, LineNode } from "chili";
 import {
     Button,
     CommandKeys,
@@ -118,7 +118,34 @@ export class MainWindow implements IWindow {
                 app.activeView?.cameraController.fitContent();
             },
         );
-      
+          PubSub.default.sub(
+            "njsgcs_makearc",
+            (
+                normalx: number,
+                normaly: number,
+                normalz: number,
+                ox: number,
+                oy: number,
+                oz: number,
+                 sx: number,
+               sy: number,
+                sz: number,
+                angle: number,
+            ) => {
+                Logger.info("makearc!!!!");
+
+                const arcnode = new ArcNode(
+                    app.activeView?.document!,
+                    new XYZ(normalx, normaly, normalz),
+                    new XYZ(ox, oy, oz),
+                    new XYZ(sx, sy, sz),
+                    angle,
+                );
+                app.activeView?.document.addNode(arcnode);
+                app.activeView?.update();
+                app.activeView?.cameraController.fitContent();
+            },
+        );
         PubSub.default.sub(
             "njsgcs_makeline",
             (startx: number, starty: number, startz: number, endx: number, endy: number, endz: number,color:number) => {

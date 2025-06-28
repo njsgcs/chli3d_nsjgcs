@@ -55,6 +55,19 @@ export interface PubSubEventMap {
         endz: number,
         materialId:number,
     ) => void;
+    njsgcs_makearc: (
+        normalx: number,
+        normaly: number,
+        normalz: number,
+        ox: number,
+        oy: number,
+        oz: number,
+        sx: number,
+        sy: number,
+        sz: number,
+        
+        angle: number,
+    ) => void;
     expenddrawview: () => void;
     njsgcs_changecamera: () => void;
     njsgcs_3drebuild: (document: Document) => void;

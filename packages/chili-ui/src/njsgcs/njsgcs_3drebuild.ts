@@ -1,13 +1,13 @@
 import { Logger, PubSub } from "chili-core";
-import DxfParser, { ILineEntity } from 'dxf-parser';
+import DxfParser, { IArcEntity, ILineEntity } from 'dxf-parser';
 class Cluster {
-    lines: [number, number, number, number][];
+    lines: [number, number, number, number,number][];
     min_x: number;
     max_x: number;
     min_y: number;
     max_y: number;
 
-    constructor(lines: [number, number, number, number][] = []) {
+    constructor(lines: [number, number, number, number,number][] = []) {
         this.lines = [...lines];
         this.min_x = Infinity;
         this.max_x = -Infinity;
@@ -34,7 +34,7 @@ class Cluster {
         return parseFloat((this.max_y - this.min_y).toFixed(1));
     }
 }
-function clusterLines(lines: [number, number, number, number][], expandDistance: number = 5): Cluster[] {
+function clusterLines(lines: [number, number, number, number,number][], expandDistance: number = 5): Cluster[] {
     const clusters: Cluster[] = [];
     const remainingLines = [...lines];
 
@@ -52,10 +52,10 @@ function clusterLines(lines: [number, number, number, number][], expandDistance:
             const expandedMinY = currentCluster.min_y - expandDistance;
             const expandedMaxY = currentCluster.max_y + expandDistance;
 
-            const toAdd: [number, number, number, number][] = [];
+            const toAdd: [number, number, number, number,number][] = [];
 
             for (const line of [...remainingLines]) {
-                const [x1, y1, x2, y2] = line;
+                const [x1, y1, x2, y2,type] = line;
                 const inBound =
                     (x1 >= expandedMinX && x1 <= expandedMaxX && y1 >= expandedMinY && y1 <= expandedMaxY) ||
                     (x2 >= expandedMinX && x2 <= expandedMaxX && y2 >= expandedMinY && y2 <= expandedMaxY);
@@ -115,7 +115,7 @@ export function rebuild3D(document: Document) {
                 const parser = new DxfParser();
                 const dxf = parser.parseSync(dxfText);
 
-                const inputlines: [number, number, number, number][] = [];
+                const inputlines: [number, number, number, number,number][] = [];
 
                 if (dxf && dxf.entities) {
                     dxf.entities.forEach(entity => {
@@ -125,8 +125,27 @@ export function rebuild3D(document: Document) {
                             const end = lineEntity.vertices[1];
 
                             if (start && end) {
-                                inputlines.push([start.x, start.y, end.x, end.y]);
+                                inputlines.push([start.x, start.y, end.x, end.y,0]);
                             }
+                        }else if (entity.type === 'Arc') {
+                            const arcEntity = entity as IArcEntity;
+                         const center = arcEntity.center;
+const radius = arcEntity.radius;
+const startAngle = arcEntity.startAngle;
+const endAngle = arcEntity.endAngle;
+// 计算起点坐标
+const startX = center.x + radius * Math.cos(startAngle);
+const startY = center.y + radius * Math.sin(startAngle);
+
+// 假设终点角度为 endAngle，则可以类似计算终点
+ const endX = center.x + radius * Math.cos(endAngle);
+ const endY = center.y + radius * Math.sin(endAngle);
+
+inputlines.push([startX, startY, center.x, center.y, 1]);
+
+                            
+                                inputlines.push([startX, startY, endX, endY,1]);
+                            
                         }
                     });
                 }
@@ -179,8 +198,8 @@ function isPointInTopCluster(x: number, y: number): boolean {
 }
 
 // 主处理逻辑
-for (const [x1, y1, x2, y2] of mostFrequentCluster.lines) {
-    for (const [tx1, ty1, tx2, ty2] of topcluauster.lines) {
+for (const [x1, y1, x2, y2,type] of mostFrequentCluster.lines) {
+    for (const [tx1, ty1, tx2, ty2,type] of topcluauster.lines) {
         // 判断 (x1, ty1) 和 (x2, ty2) 是否在 topcluauster 的线段中
         const p1Exists = isPointInTopCluster(x1, ty1);
         const p2Exists = isPointInTopCluster(x2, ty2);
