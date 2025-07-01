@@ -1,6 +1,6 @@
 .viewport {
-    width: 1500px;
-    height: 750px;
+    width: 80vw;
+    height: 65vh;
 }
 
 .horizontalLayout {
@@ -9,7 +9,7 @@
 }
 
 .sidebar {
-    flex: 0 0 800px; /* 根据需要调整高度 */
+    flex: 0 0 60vh; /* 根据需要调整高度 */
    overflow: auto;
   
 }

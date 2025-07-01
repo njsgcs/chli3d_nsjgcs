@@ -55,6 +55,10 @@
         {
             "name": "Debug Rspack and Launch Edge",
             "configurations": ["Debug Rspack", "debug", "Python: 启动 detect.py 服务"]
+        },
+           {
+            "name": "Debug Rspack and Launch Edge without pythno",
+            "configurations": ["Debug Rspack", "debug"]
         }
     ]
 }

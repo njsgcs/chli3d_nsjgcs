@@ -1,33 +1,18 @@
 {
-  root: '/media/njsgcs/code/ubuntu/chili3d',
+  root: '/home/njsgcs/chili3d',
   registry: 'https://registry.npmmirror.com',
-  pkgs: [
-    {
-      name: 'rspack',
-      version: 'latest',
-      type: 'tag',
-      alias: undefined,
-      arg: [Result]
-    },
-    {
-      name: '@rspack/cli',
-      version: 'latest',
-      type: 'tag',
-      alias: undefined,
-      arg: [Result]
-    }
-  ],
+  pkgs: [],
   production: false,
   cacheStrict: false,
   cacheDir: '/home/njsgcs/.npminstall_tarball',
   env: {
     npm_config_registry: 'https://registry.npmmirror.com',
-    npm_config_argv: '{"remain":[],"cooked":["--fix-bug-versions","--china","--userconfig=/home/njsgcs/.cnpmrc","--disturl=https://cdn.npmmirror.com/binaries/node","--registry=https://registry.npmmirror.com","--save-dev","rspack","@rspack/cli"],"original":["--fix-bug-versions","--china","--userconfig=/home/njsgcs/.cnpmrc","--disturl=https://cdn.npmmirror.com/binaries/node","--registry=https://registry.npmmirror.com","--save-dev","rspack","@rspack/cli"]}',
-    npm_config_user_agent: 'npminstall/7.12.0 npm/? node/v18.19.1 linux x64',
+    npm_config_argv: '{"remain":[],"cooked":["--fix-bug-versions","--china","--userconfig=/home/njsgcs/.cnpmrc","--disturl=https://cdn.npmmirror.com/binaries/node","--registry=https://registry.npmmirror.com"],"original":["--fix-bug-versions","--china","--userconfig=/home/njsgcs/.cnpmrc","--disturl=https://cdn.npmmirror.com/binaries/node","--registry=https://registry.npmmirror.com"]}',
+    npm_config_user_agent: 'npminstall/7.12.0 npm/? node/v22.17.0 linux x64',
     npm_config_cache: '/home/njsgcs/.npminstall_tarball',
-    NODE: '/usr/bin/node',
-    npm_node_execpath: '/usr/bin/node',
-    npm_execpath: '/usr/local/lib/node_modules/cnpm/node_modules/npminstall/bin/install.js',
+    NODE: '/home/njsgcs/.nvm/versions/node/v22.17.0/bin/node',
+    npm_node_execpath: '/home/njsgcs/.nvm/versions/node/v22.17.0/bin/node',
+    npm_execpath: '/home/njsgcs/.nvm/versions/node/v22.17.0/lib/node_modules/cnpm/node_modules/npminstall/bin/install.js',
     npm_config_userconfig: '/home/njsgcs/.cnpmrc',
     npm_config_disturl: 'https://cdn.npmmirror.com/binaries/node',
     npm_config_r: 'https://registry.npmmirror.com',
@@ -60,8 +45,8 @@
     npm_config_sharp_libvips_binary_host: 'https://cdn.npmmirror.com/binaries/sharp-libvips',
     npm_config_robotjs_binary_host: 'https://cdn.npmmirror.com/binaries/robotjs',
     npm_config_gl_binary_host: 'https://cdn.npmmirror.com/binaries/gl',
-    npm_rootpath: '/media/njsgcs/code/ubuntu/chili3d',
-    INIT_CWD: '/media/njsgcs/code/ubuntu/chili3d'
+    npm_rootpath: '/home/njsgcs/chili3d',
+    INIT_CWD: '/home/njsgcs/chili3d'
   },
   binaryMirrors: {
     ENVS: {
@@ -203,48 +188,45 @@
   disableFallbackStore: false,
   workspacesMap: Map(10) {
     'chili-web' => {
-      root: '/media/njsgcs/code/ubuntu/chili3d/packages/chili-web',
+      root: '/home/njsgcs/chili3d/packages/chili-web',
       package: [Object]
     },
     'chili-core' => {
-      root: '/media/njsgcs/code/ubuntu/chili3d/packages/chili-core',
+      root: '/home/njsgcs/chili3d/packages/chili-core',
       package: [Object]
     },
     'chili-wasm' => {
-      root: '/media/njsgcs/code/ubuntu/chili3d/packages/chili-wasm',
+      root: '/home/njsgcs/chili3d/packages/chili-wasm',
       package: [Object]
     },
     'chili-vis' => {
-      root: '/media/njsgcs/code/ubuntu/chili3d/packages/chili-vis',
-      package: [Object]
-    },
-    'chili-storage' => {
-      root: '/media/njsgcs/code/ubuntu/chili3d/packages/chili-storage',
+      root: '/home/njsgcs/chili3d/packages/chili-vis',
       package: [Object]
     },
     'chili-three' => {
-      root: '/media/njsgcs/code/ubuntu/chili3d/packages/chili-three',
+      root: '/home/njsgcs/chili3d/packages/chili-three',
+      package: [Object]
+    },
+    'chili-storage' => {
+      root: '/home/njsgcs/chili3d/packages/chili-storage',
       package: [Object]
     },
     'chili-geo' => {
-      root: '/media/njsgcs/code/ubuntu/chili3d/packages/chili-geo',
+      root: '/home/njsgcs/chili3d/packages/chili-geo',
       package: [Object]
     },
     'chili-ui' => {
-      root: '/media/njsgcs/code/ubuntu/chili3d/packages/chili-ui',
+      root: '/home/njsgcs/chili3d/packages/chili-ui',
       package: [Object]
     },
-    'chili' => {
-      root: '/media/njsgcs/code/ubuntu/chili3d/packages/chili',
-      package: [Object]
-    },
+    'chili' => { root: '/home/njsgcs/chili3d/packages/chili', package: [Object] },
     'chili-builder' => {
-      root: '/media/njsgcs/code/ubuntu/chili3d/packages/chili-builder',
+      root: '/home/njsgcs/chili3d/packages/chili-builder',
       package: [Object]
     }
   },
   enableWorkspace: true,
-  workspaceRoot: '/media/njsgcs/code/ubuntu/chili3d',
+  workspaceRoot: '/home/njsgcs/chili3d',
   isWorkspaceRoot: true,
   isWorkspacePackage: false,
   offline: false,

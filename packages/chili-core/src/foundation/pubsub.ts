@@ -68,6 +68,15 @@ export interface PubSubEventMap {
         
         angle: number,
     ) => void;
+    njsgcs_makecircle : (
+        normalx: number,
+        normaly: number,
+        normalz: number,
+        ox: number,
+        oy: number,
+        oz: number,
+        radius: number,
+    ) => void;
     expenddrawview: () => void;
     njsgcs_changecamera: () => void;
     njsgcs_3drebuild: (document: Document) => void;
