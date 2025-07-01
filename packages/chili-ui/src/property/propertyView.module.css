@@ -1,0 +1,41 @@
+.root {
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    margin: 2px 18px;
+    font-size: 1.15rem;
+    font-weight: bold;
+    flex: 0;
+}
+
+.textarea textarea {
+    width: 200px;
+    padding: 5px 5px;
+    height: 80px;
+}
+
+.panel {
+    flex: 1;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    max-height: 360px;
+    background-color: var(--panel-background-color);
+}
+
+.rootProperties {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.name {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-gap: 10px;
+    align-items: center;
+}

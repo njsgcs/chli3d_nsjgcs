@@ -1,0 +1,15 @@
+.viewport {
+    width: 1500px;
+    height: 750px;
+}
+
+.horizontalLayout {
+    display: flex;
+    flex-direction: row;
+}
+
+.sidebar {
+    flex: 0 0 800px; /* 根据需要调整高度 */
+   overflow: auto;
+  
+}

@@ -1,0 +1,60 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "vscode-jest-tests.v2",
+            "program": "${workspaceFolder}/node_modules/.bin/jest",
+            "env": { "NODE_OPTIONS": "--experimental-vm-modules" },
+            "args": ["${fileBasenameNoExtension}", "--config", "jest.config.js"],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "windows": {
+                "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+            }
+        },
+        {
+            "name": "Python: 启动 detect.py 服务",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/yolo_detect/api.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": []
+        },
+        {
+            "name": "debug",
+            "type": "msedge",
+            "request": "launch",
+            "url": "http://localhost:8080/",
+            "windows": {
+             "postDebugTask": "Kill Vite Dev Server"
+            },         "linux":{
+
+                "postDebugTask": "Kill Vite Dev Server2",
+        
+            }
+             
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Rspack",
+            "runtimeExecutable": "npx",
+            "args": ["rspack", "dev", "--config", "${workspaceFolder}/rspack.config.js"],
+            "console": "integratedTerminal",
+            "linux":{
+
+                "postDebugTask": "Kill Vite Dev Server3",
+        
+            }
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Debug Rspack and Launch Edge",
+            "configurations": ["Debug Rspack", "debug", "Python: 启动 detect.py 服务"]
+        }
+    ]
+}

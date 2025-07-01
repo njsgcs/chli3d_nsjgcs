@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "allowJs": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    
+    "plugins": [{ "name": "typescript-plugin-css-modules" }]
+  },
+  "include": ["packages"],
+  "exclude": [
+    "packages/chili-occ/occ-wasm", 
+    "packages/chili-wasm/lib", 
+    "packages/chili-three/src/outlinePass.js"
+  ]
+}
