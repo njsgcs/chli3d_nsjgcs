@@ -9,6 +9,7 @@ import { rebuild3D2 } from "./njsgcs_3drebuild2";
 import { face_rebuild } from "./njsgcs_facerebuild";
 import { readdxf } from "./njsgcs_readdxf";
 import { send_to_llm } from "./njsgcs_send_to_llm";
+import { unfold } from "./njsgcs_unfold";
 export class njsgcs_ProjectView extends HTMLElement {
     private _activeDocument: IDocument | undefined;
     private _activeView: IView | undefined;
@@ -330,6 +331,20 @@ export class njsgcs_ProjectView extends HTMLElement {
                     onclick: async () => {
                         try {
                            face_rebuild (this._activeDocument!);
+                          
+                        } catch (error) {
+                            Logger.error("Failed to parse response as JSON:", error);
+                        }
+                    },
+                }),
+            ),
+              div(
+                { className: style.buttons },
+                button({
+                    textContent: "展开",
+                    onclick: async () => {
+                        try {
+                           unfold (this._activeDocument!);
                           
                         } catch (error) {
                             Logger.error("Failed to parse response as JSON:", error);

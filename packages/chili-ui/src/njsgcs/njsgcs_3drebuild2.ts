@@ -412,7 +412,7 @@ function drawlines(x1:number, y1:number, z1:number , x2:number, y2:number, z2:nu
  if([x1, y1, z1].join(',') === [x2, y2, z2].join(','))
     return;
    
-    const drawline2=[x1, y1, z1 , x2, y2,z2,type]
+    const drawline2=[x1, y1, z1 , x2, y2,z2]
             const key2 = drawline2.map(v => v.toFixed(1)).join(',');
             if (!seenLinePairs.has(key2)) {
                 seenLinePairs.add(key2);
