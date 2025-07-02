@@ -1,5 +1,5 @@
 import { Logger, PubSub } from "chili-core";
-import DxfParser, { IArcEntity, IEntity, ILineEntity, ISplineEntity } from 'dxf-parser';
+import DxfParser, { IArcEntity, ICircleEntity, IEntity, ILineEntity, ISplineEntity } from 'dxf-parser';
 class Cluster {
     lines: [number, number, number, number,number,number][];
     min_x: number;
@@ -168,16 +168,29 @@ const startY = center.y + radius * Math.sin(startAngle);
                                 const end = controlPoints[controlPoints.length - 1];
                           
                              
-                                inputlines.push([start.x,start.y,end.x,end.y,lineId,2]);
+                                inputlines.push([start.x,start.y,end.x,end.y,lineId,0]);
                               lineId++;
                         }}
+                        else if(entity.type=="CIRCLE"){
+                           lineMap.set(lineId, entity);
+                          const circleEntity = entity as ICircleEntity;
+                          const center = circleEntity.center;
+                          const radius = circleEntity.radius;
+                          const startx=center.x-radius;
+                          const starty=center.y-radius;
+                          const endx=center.x+radius;
+                          const endy=center.y+radius;
+                          inputlines.push([startx, starty, endx, endy,lineId,2]);
+                          lineId++;
+
+                        }
 
                     });
                 }
 
                 // 执行聚类
                 const clusters = clusterLines(inputlines, 5);
-               Logger.info(`Clusters: ${clusters.length}`);
+                 Logger.info(`Clustering completed with ${clusters.length} clusters`);
                 const { mostMinX, mostMinY } = getMostFrequentMinXY(clusters);
                 const mostFrequentClusters = clusters.filter(cluster => {
     return cluster.min_x === mostMinX.value && cluster.min_y === mostMinY.value;
@@ -217,55 +230,41 @@ function formatKey(x1: number, y1: number, x2: number, y2: number): string {
 const fseen = new Set<string>();
 const tseen = new Set<string>();
 const rseen = new Set<string>();
-// 主处理逻辑
-const frontarcmap = new Map<string, number>();
-const toparcmap = new Map<string, number>();
-const rightarcmap = new Map<string, number>();
+
 for (const [x1, y1, x2, y2,lineId,type] of mostFrequentCluster.lines) {
      
 
   
-if (type == 1) {
+
     const x1f = parseFloat(x1.toFixed(1));
     const y1f = parseFloat(y1.toFixed(1));
     const x2f = parseFloat(x2.toFixed(1));
     const y2f = parseFloat(y2.toFixed(1));
 
-    const key1 = formatKey(x1f, y1f, x2f, y2f);
-    const key2 = formatKey(x2f, y2f, x1f, y1f);
 
-    frontarcmap.set(key1, lineId);
-    frontarcmap.set(key2, lineId);
-
-}
     
-frontlinelist.push([x1, y1, x2, y2,lineId,type]);
+frontlinelist.push([x1f, y1f, x2f, y2f,lineId,type]);
 
 
-addUniquePoint(x1, y1, frontpointlist, fseen);
-addUniquePoint(x2, y2, frontpointlist, fseen);
+addUniquePoint(x1f, y1f, frontpointlist, fseen);
+addUniquePoint(x2f, y2f, frontpointlist, fseen);
 
 
  
 }
 for (const [x1, y1, x2, y2,lineId,type] of topcluauster.lines) {
      
-if(type==1){
+
         const x1f = parseFloat(x1.toFixed(1));
     const y1f = parseFloat((y1- clusterMinY).toFixed(1));
     const x2f = parseFloat(x2.toFixed(1));
     const y2f = parseFloat(( y2- clusterMinY).toFixed(1));
 
-    const key1 = formatKey(x1f, y1f, x2f, y2f);
-    const key2 = formatKey(x2f, y2f, x1f, y1f);
-    toparcmap.set(key1, lineId);
-    toparcmap.set(key2, lineId);
-    
-}
-toplinelist.push([x1, y1- clusterMinY, x2, y2- clusterMinY,lineId,type]);
 
-addUniquePoint(x1, y1- clusterMinY, toppointlist, tseen);
-addUniquePoint(x2, y2- clusterMinY, toppointlist, tseen);
+toplinelist.push([x1f, y1f, x2f, y2f,lineId,type]);
+
+addUniquePoint(x1f, y1f, toppointlist, tseen);
+addUniquePoint(x2f, y2f, toppointlist, tseen);
 
 
 
@@ -275,22 +274,16 @@ addUniquePoint(x2, y2- clusterMinY, toppointlist, tseen);
  
 for (const [x1, y1, x2, y2,lineId,type] of rightcluster.lines) {
   
-    if(type==1){
+   
           const x1f = parseFloat((x1-clusterMinx).toFixed(1));
     const y1f = parseFloat(y1.toFixed(1));
     const x2f = parseFloat((x2-clusterMinx).toFixed(1));
     const y2f = parseFloat(y2.toFixed(1));
 
-    const key1 = formatKey(x1f, y1f, x2f, y2f);
-    const key2 = formatKey(x2f, y2f, x1f, y1f);
-    rightarcmap.set(key1, lineId);
-     
-    rightarcmap.set(key2, lineId);
-    }
-     rightlinelist.push([x1-clusterMinx, y1, x2-clusterMinx, y2,lineId,type]);
+     rightlinelist.push([x1f, y1f, x2f, y2f,lineId,type]);
 
-     addUniquePoint(x1-clusterMinx, y1, rightpointlist, rseen);
-     addUniquePoint(x2-clusterMinx, y2, rightpointlist, rseen);
+     addUniquePoint(x1f, y1f, rightpointlist, rseen);
+     addUniquePoint(x2f, y2f, rightpointlist, rseen);
    
   
     
@@ -298,9 +291,11 @@ for (const [x1, y1, x2, y2,lineId,type] of rightcluster.lines) {
 }
 Logger.info("2d线段和点收集完毕" )
 Logger.info("frontlinelist:",frontlinelist)
+Logger.info("toplinelist:",toplinelist)
+Logger.info("rightlinelist:",rightlinelist)
 Logger.info(`主视图有${frontlinelist.length}条线段`, `顶视图有${toplinelist.length}条线段`, `右视图有${rightlinelist.length}条线段`);
 Logger.info(`主视图有${frontpointlist.length}个点`, `顶视图有${toppointlist.length}个点`, `右视图有${rightpointlist.length}个点`);
-Logger.info(`主视图有${frontarcmap.size}个弧线, 顶视图有${toparcmap.size}个弧线, 右视图有${rightarcmap.size}个弧线`)
+
 // Logger.info(`rightarcmap:`)
 // for (const [key, value] of rightarcmap.entries()) {
 //   Logger.info(`${key}: ${value}`);
@@ -317,24 +312,7 @@ function addUniquePoint(
     pointList.push([x, y]);
   }
 }
- const lines3d:[number,number,number,number,number,number,number,number,number,number][]=[]
 
-
-
-
-const seenLinePairs = new Set<string>(); // 用于记录已经添加过的 [lineId, lineId2] 对
-function drawlines(x1:number, y1:number, z1:number , x2:number, y2:number, z2:number , lineId:number, type:number,color:number,viewid:number){
- if([x1, y1, z1].join(',') === [x2, y2, z2].join(','))
-    return;
- 
-    const drawline2=[x1, y1, z1 , x2, y2,z2]
-            const key2 = drawline2.map(v => v.toFixed(2)).join(',');
-            if (!seenLinePairs.has(key2)) {
-                seenLinePairs.add(key2);
-            lines3d.push([x1, y1, z1, x2, y2, z2 , lineId, type,color,viewid]);
-            }
-
-}
 const point3dlist: [number, number, number][] = [];
 const seen = new Set<string>(); // 用于去重
 
@@ -372,9 +350,9 @@ function isPointOnLineSegment(
 function makemap(
   lines: [number, number, number, number, number, number][],
   points: [number, number][],
-  map: Map<string, boolean>
+  map: Map<string, {lineid:number,type:number}>
 ): void {
-  for (const [x1, y1, x2, y2] of lines) {
+  for (const [x1, y1, x2, y2,lineId,type] of lines) {
     const relevantPoints: [number, number][] = [];
 
     for (const [px, py] of points) {
@@ -385,7 +363,7 @@ function makemap(
 
         relevantPoints.push([pxFixed, pyFixed]);
         const key = `${pxFixed},${pyFixed},${pxFixed},${pyFixed}`;
-        map.set(key, true);
+      if(type==0) map.set(key, {lineid:lineId,type:type});
       }
     }
 
@@ -404,26 +382,44 @@ function makemap(
         const key1 = `${p1xFixed},${p1yFixed},${p2xFixed},${p2yFixed}`;
         const key2 = `${p2xFixed},${p2yFixed},${p1xFixed},${p1yFixed}`;
 
-        map.set(key1, true);
-        map.set(key2, true);
+        map.set(key1, {lineid:lineId,type:type});
+        map.set(key2,  {lineid:lineId,type:type});
       }
     }
   }
 }
 
-const frontmap=new Map<string,boolean>();
+const frontmap=new Map<string,{lineid:number,type:number}>();
 makemap(frontlinelist,frontpointlist,frontmap);
 Logger.info(`frontmap completed with ${frontmap.size} pairs`);
-const toppointmap=new Map<string,boolean>();
+const toppointmap=new Map<string,{lineid:number,type:number}>();
 makemap(toplinelist,toppointlist,toppointmap);
 Logger.info(`toppointmap completed with ${toppointmap.size} pairs`);
-const rightpointmap=new Map<string,boolean>();
+const rightpointmap=new Map<string,{lineid:number,type:number}>();
 makemap(rightlinelist,rightpointlist,rightpointmap);
 Logger.info(`rightpointmap completed with ${rightpointmap.size} pairs`);
 // Logger.info("rightpointmap 内容如下：");
 // for (const [key, value] of rightpointmap.entries()) {
-//   Logger.info(`${key}: ${value}`);
+//   Logger.info(`${key}: lineid=${value.lineid},type=${value.type}`);
 // }
+ const lines3d:[number,number,number,number,number,number,number,number,number,number][]=[]
+
+
+
+
+const seenLinePairs = new Set<string>(); // 用于记录已经添加过的 [lineId, lineId2] 对
+function drawlines(x1:number, y1:number, z1:number , x2:number, y2:number, z2:number , lineId:number, type:number,color:number,viewid:number){
+ if([x1, y1, z1].join(',') === [x2, y2, z2].join(','))
+    return;
+   
+    const drawline2=[x1, y1, z1 , x2, y2,z2,type]
+            const key2 = drawline2.map(v => v.toFixed(1)).join(',');
+            if (!seenLinePairs.has(key2)) {
+                seenLinePairs.add(key2);
+               // Logger.info(`key2: ${key2} drawtype2:${type}`);
+            lines3d.push([x1, y1, z1, x2, y2, z2 , lineId, type,color,viewid]);
+            }
+}
 for (const [x1, y1, z1] of point3dlist) {
   for (const [x2, y2, z2] of point3dlist) {
     if (x1 === x2 && y1 === y2 && z1 === z2) continue;
@@ -436,49 +432,58 @@ for (const [x1, y1, z1] of point3dlist) {
     const y2f = parseFloat(y2.toFixed(1));
     const z2f = parseFloat(z2.toFixed(1));
 
-    const frontKey = `${x1f},${y1f},${x2f},${y2f}`;
-    const topKey = `${x1f},${z1f},${x2f},${z2f}`;
-     const rightKey = `${z1f},${y1f},${z2f},${y2f}`;
+    const frontKey = formatKey(x1f,y1f,x2f,y2f);
+    const topKey =  formatKey(x1f,z1f,x2f,z2f);
+     const rightKey = formatKey(z1f,y1f,z2f,y2f);
 
      const existinfront = frontmap.get(frontKey);
      const existintop = toppointmap.get(topKey);
      const existinright = rightpointmap.get(rightKey);
     if (existinfront&&existintop&&existinright) {
-   //  Logger.info(`rightKey:${rightKey}`)
-        const frontlineId=frontarcmap.get( formatKey(x1f,y1f,x2f,y2f));
-        const toplineId=toparcmap.get( formatKey(x1f,z1f,x2f,z2f));
-        const rightlineId=rightarcmap.get( formatKey(z1f,y1f,z2f,y2f));
-    
-if(frontlineId){
-  
-drawlines(x1f, y1f, z1f, x2f, y2f, z2f, frontlineId, 1, 1,0);
-}
-else if(toplineId){
-  drawlines(x1f, y1f, z1f, x2f, y2f, z2f, toplineId, 1, 1,1);
-}
-else if(rightlineId){
-  Logger.info(`rightlineId:${rightlineId}`)
-  drawlines(x1f, y1f, z1f, x2f, y2f, z2f, rightlineId, 1, 1,2);
-}
-else{drawlines(x1f, y1f, z1f, x2f, y2f, z2f, 0, 0, 1,-1);}
-      }
-      
 
-    
-  }
-}
+
+  const frontlineId = existinfront.lineid;
+  const fronttype= existinfront.type;
+  //Logger.info(`frontlineId:${frontlineId},fronttype:${fronttype}`);
+
+
+  const toplineId = existintop.lineid;
+  const toptype= existintop.type;
+ // Logger.info(`toplineId:${toplineId},toptype:${toptype}`);
+ 
+
+
+  const rightlineId = existinright.lineid;
+  const righttype= existinright.type;
+ // Logger.info(`rightlineId:${rightlineId},righttype:${righttype}`);
+  
+const drawCommands = [
+  { type: fronttype, draw: () => drawlines(x1f, y1f, z1f, x2f, y2f, z2f, frontlineId, fronttype, 1, 0) },
+  { type: toptype, draw: () => drawlines(x1f, y1f, z1f, x2f, y2f, z2f, toplineId, toptype, 1, 1) },
+  { type: righttype, draw: () => drawlines(x1f, y1f, z1f, x2f, y2f, z2f, rightlineId, righttype, 1, 2) }
+];
+
+// 按照 type 大小排序
+drawCommands.sort((a, b) => b.type-a.type );
+
+// 依次执行排序后的 drawlines 调用
+drawCommands.forEach(command => command.draw());
+
+}}}
 
 
             
 Logger.info(`lines3d completed with ${lines3d.length} lines3d`);
                  lines3d.forEach(line => {
                 const [x1, y1, z1, x2, y2, z2, lineId, type,color,viewid] = line;
+           
                 if(type===0){
                 PubSub.default.pub("njsgcs_makeline", line[0], line[1],  line[2], line[3], line[4], line[5], line[8]); 
             }else if(type===1){
               const entity=lineMap.get(lineId);
-               
+                
                             const arcEntity = entity as IArcEntity;
+                          
                            const angleDelta = (arcEntity.endAngle-arcEntity.startAngle )*180/Math.PI;
                          const center = arcEntity.center;
                          const radius = arcEntity.radius;
@@ -509,12 +514,32 @@ const startX = centerx + radius * Math.cos(arcEntity.startAngle);
 const startY = centery + radius * Math.sin(arcEntity.startAngle);
 const endX = center.x + radius * Math.cos(arcEntity.endAngle);
     const endY =centery + radius * Math.sin(arcEntity.endAngle);
-        Logger.info(`startX:${startX} startY:${startY} endX:${endX} endY:${endY}`);
-    Logger.info(`x1:${x1} y1:${z1} x2:${x2} y2:${z2}`)
+      //  Logger.info(`startX:${startX} startY:${startY} endX:${endX} endY:${endY}`);
+   // Logger.info(`x1:${x1} y1:${z1} x2:${x2} y2:${z2}`)
 if(startX==x1&&startY==z1&&endX==x2&&endY==z2)PubSub.default.pub("njsgcs_makearc", 0,1,0, centerx,y1,centery,x1, y1, z1,-(angleDelta+360)); 
      }
 
                
+            }
+            else if(type==2){
+    const entity=lineMap.get(lineId);
+    const circleEntity=entity as ICircleEntity;
+    const center = circleEntity.center;
+    const radius = circleEntity.radius;
+    if (viewid==0){
+      PubSub.default.pub("njsgcs_makecircle", 0,0,1, center.x,center.y,z1,radius);
+    }else if(viewid==1){
+         const centerx=center.x;
+const centery= center.y-clusterMinY;
+      PubSub.default.pub("njsgcs_makecircle", 0,1,0, centerx,y1,centery,radius);
+    }
+    else if(viewid==2){
+      const centerx=center.x-clusterMinx;
+      const centery= center.y;
+      PubSub.default.pub("njsgcs_makecircle", 1,0,0, x1,centery,centerx,radius);
+    }
+
+
             }
               })
              ///////////////////////////////
@@ -528,7 +553,7 @@ if(startX==x1&&startY==z1&&endX==x2&&endY==z2)PubSub.default.pub("njsgcs_makearc
                 //     });
                 // });
   ///////////////////////////////
-                Logger.info(`Clustering completed with ${clusters.length} clusters`);
+             
             };
 
             reader.readAsText(file);
