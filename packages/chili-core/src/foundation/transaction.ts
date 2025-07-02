@@ -3,7 +3,6 @@
 
 import { IDocument } from "../document";
 import { ArrayRecord, IHistoryRecord } from "./history";
-import { Logger } from "./logger";
 
 export class Transaction {
     private static readonly _transactionMap: WeakMap<IDocument, ArrayRecord> = new WeakMap();
@@ -25,7 +24,7 @@ export class Transaction {
 
     static addToHistory(document: IDocument, record: IHistoryRecord) {
         document.history.add(record);
-        Logger.info(`history added ${record.name}`);
+     //   Logger.info(`history added ${record.name}`);
     }
 
     static execute(document: IDocument, name: string, action: () => void) {

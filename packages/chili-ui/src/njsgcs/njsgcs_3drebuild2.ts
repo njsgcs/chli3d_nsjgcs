@@ -1,5 +1,5 @@
 import { Logger, PubSub } from "chili-core";
-import DxfParser, { IArcEntity, IEntity, ILineEntity } from 'dxf-parser';
+import DxfParser, { IArcEntity, IEntity, ILineEntity, ISplineEntity } from 'dxf-parser';
 class Cluster {
     lines: [number, number, number, number,number,number][];
     min_x: number;
@@ -117,6 +117,7 @@ export function rebuild3D2(document: Document) {
 
                 const inputlines: [number, number, number, number,number,number][] = [];
 const lineMap = new Map<number, IEntity>(); 
+
 let lineId = 0;
                 if (dxf && dxf.entities) {
                     dxf.entities.forEach(entity => {
@@ -132,7 +133,7 @@ let lineId = 0;
                                 inputlines.push([start.x, start.y, end.x, end.y, lineId,0]);
                                 lineId++;
                             }
-                        }else if (entity.type === 'Arc') {
+                        }else if (entity.type === 'ARC') {
                              lineMap.set(lineId, entity);
                             const arcEntity = entity as IArcEntity;
                          const center = arcEntity.center;
@@ -149,16 +150,34 @@ const startY = center.y + radius * Math.sin(startAngle);
 
 
 
-                            
                                 inputlines.push([startX, startY, endX, endY,lineId,1]);
+                                Logger.info(`Arc: ${startX}, ${startY}, ${endX}, ${endY}`);
                               lineId++;
                         }
+                        else if (entity.type=="SPLINE"){
+                         
+   lineMap.set(lineId, entity);
+                           const splineEntity = entity as ISplineEntity ;
+                             if (splineEntity.controlPoints && splineEntity.controlPoints.length > 0) {
+                              
+                              const controlPoints = splineEntity.controlPoints;
+                          
+                              // 将控制点头尾相连画线
+                            
+                                const start = controlPoints[0];
+                                const end = controlPoints[controlPoints.length - 1];
+                          
+                             
+                                inputlines.push([start.x,start.y,end.x,end.y,lineId,2]);
+                              lineId++;
+                        }}
+
                     });
                 }
 
                 // 执行聚类
                 const clusters = clusterLines(inputlines, 5);
-               
+               Logger.info(`Clusters: ${clusters.length}`);
                 const { mostMinX, mostMinY } = getMostFrequentMinXY(clusters);
                 const mostFrequentClusters = clusters.filter(cluster => {
     return cluster.min_x === mostMinX.value && cluster.min_y === mostMinY.value;
@@ -191,15 +210,34 @@ const toppointlist: [number, number][] = [];
 const rightpointlist: [number, number][] = [];
 const clusterMinY = topcluauster.min_y;
 const clusterMinx= rightcluster.min_x;
-
+function formatKey(x1: number, y1: number, x2: number, y2: number): string {
+    return `${x1},${y1},${x2},${y2}`;
+}
 
 const fseen = new Set<string>();
 const tseen = new Set<string>();
 const rseen = new Set<string>();
 // 主处理逻辑
+const frontarcmap = new Map<string, number>();
+const toparcmap = new Map<string, number>();
+const rightarcmap = new Map<string, number>();
 for (const [x1, y1, x2, y2,lineId,type] of mostFrequentCluster.lines) {
      
 
+  
+if (type == 1) {
+    const x1f = parseFloat(x1.toFixed(1));
+    const y1f = parseFloat(y1.toFixed(1));
+    const x2f = parseFloat(x2.toFixed(1));
+    const y2f = parseFloat(y2.toFixed(1));
+
+    const key1 = formatKey(x1f, y1f, x2f, y2f);
+    const key2 = formatKey(x2f, y2f, x1f, y1f);
+
+    frontarcmap.set(key1, lineId);
+    frontarcmap.set(key2, lineId);
+
+}
     
 frontlinelist.push([x1, y1, x2, y2,lineId,type]);
 
@@ -212,7 +250,18 @@ addUniquePoint(x2, y2, frontpointlist, fseen);
 }
 for (const [x1, y1, x2, y2,lineId,type] of topcluauster.lines) {
      
+if(type==1){
+        const x1f = parseFloat(x1.toFixed(1));
+    const y1f = parseFloat((y1- clusterMinY).toFixed(1));
+    const x2f = parseFloat(x2.toFixed(1));
+    const y2f = parseFloat(( y2- clusterMinY).toFixed(1));
 
+    const key1 = formatKey(x1f, y1f, x2f, y2f);
+    const key2 = formatKey(x2f, y2f, x1f, y1f);
+    toparcmap.set(key1, lineId);
+    toparcmap.set(key2, lineId);
+    
+}
 toplinelist.push([x1, y1- clusterMinY, x2, y2- clusterMinY,lineId,type]);
 
 addUniquePoint(x1, y1- clusterMinY, toppointlist, tseen);
@@ -226,7 +275,18 @@ addUniquePoint(x2, y2- clusterMinY, toppointlist, tseen);
  
 for (const [x1, y1, x2, y2,lineId,type] of rightcluster.lines) {
   
-    
+    if(type==1){
+          const x1f = parseFloat((x1-clusterMinx).toFixed(1));
+    const y1f = parseFloat(y1.toFixed(1));
+    const x2f = parseFloat((x2-clusterMinx).toFixed(1));
+    const y2f = parseFloat(y2.toFixed(1));
+
+    const key1 = formatKey(x1f, y1f, x2f, y2f);
+    const key2 = formatKey(x2f, y2f, x1f, y1f);
+    rightarcmap.set(key1, lineId);
+     
+    rightarcmap.set(key2, lineId);
+    }
      rightlinelist.push([x1-clusterMinx, y1, x2-clusterMinx, y2,lineId,type]);
 
      addUniquePoint(x1-clusterMinx, y1, rightpointlist, rseen);
@@ -237,10 +297,14 @@ for (const [x1, y1, x2, y2,lineId,type] of rightcluster.lines) {
 
 }
 Logger.info("2d线段和点收集完毕" )
-Logger.info(frontlinelist)
+Logger.info("frontlinelist:",frontlinelist)
 Logger.info(`主视图有${frontlinelist.length}条线段`, `顶视图有${toplinelist.length}条线段`, `右视图有${rightlinelist.length}条线段`);
 Logger.info(`主视图有${frontpointlist.length}个点`, `顶视图有${toppointlist.length}个点`, `右视图有${rightpointlist.length}个点`);
-
+Logger.info(`主视图有${frontarcmap.size}个弧线, 顶视图有${toparcmap.size}个弧线, 右视图有${rightarcmap.size}个弧线`)
+// Logger.info(`rightarcmap:`)
+// for (const [key, value] of rightarcmap.entries()) {
+//   Logger.info(`${key}: ${value}`);
+// }
 function addUniquePoint(
   x: number,
   y: number,
@@ -253,13 +317,13 @@ function addUniquePoint(
     pointList.push([x, y]);
   }
 }
- const lines3d:[number,number,number,number,number,number,number,number,number][]=[]
+ const lines3d:[number,number,number,number,number,number,number,number,number,number][]=[]
 
 
 
 
 const seenLinePairs = new Set<string>(); // 用于记录已经添加过的 [lineId, lineId2] 对
-function drawlines(x1:number, y1:number, z1:number , x2:number, y2:number, z2:number , lineId:number, type:number,color:number){
+function drawlines(x1:number, y1:number, z1:number , x2:number, y2:number, z2:number , lineId:number, type:number,color:number,viewid:number){
  if([x1, y1, z1].join(',') === [x2, y2, z2].join(','))
     return;
  
@@ -267,7 +331,7 @@ function drawlines(x1:number, y1:number, z1:number , x2:number, y2:number, z2:nu
             const key2 = drawline2.map(v => v.toFixed(2)).join(',');
             if (!seenLinePairs.has(key2)) {
                 seenLinePairs.add(key2);
-            lines3d.push([x1, y1, z1, x2, y2, z2 , lineId, type,color]);
+            lines3d.push([x1, y1, z1, x2, y2, z2 , lineId, type,color,viewid]);
             }
 
 }
@@ -356,10 +420,10 @@ Logger.info(`toppointmap completed with ${toppointmap.size} pairs`);
 const rightpointmap=new Map<string,boolean>();
 makemap(rightlinelist,rightpointlist,rightpointmap);
 Logger.info(`rightpointmap completed with ${rightpointmap.size} pairs`);
-Logger.info("rightpointmap 内容如下：");
-for (const [key, value] of rightpointmap.entries()) {
-  Logger.info(`${key}: ${value}`);
-}
+// Logger.info("rightpointmap 内容如下：");
+// for (const [key, value] of rightpointmap.entries()) {
+//   Logger.info(`${key}: ${value}`);
+// }
 for (const [x1, y1, z1] of point3dlist) {
   for (const [x2, y2, z2] of point3dlist) {
     if (x1 === x2 && y1 === y2 && z1 === z2) continue;
@@ -375,9 +439,32 @@ for (const [x1, y1, z1] of point3dlist) {
     const frontKey = `${x1f},${y1f},${x2f},${y2f}`;
     const topKey = `${x1f},${z1f},${x2f},${z2f}`;
      const rightKey = `${z1f},${y1f},${z2f},${y2f}`;
-    if (frontmap.get(frontKey) && toppointmap.get(topKey)&& rightpointmap.get(rightKey)) {
-      drawlines(x1f, y1f, z1f, x2f, y2f, z2f, 0, 0, 1);
-    }
+
+     const existinfront = frontmap.get(frontKey);
+     const existintop = toppointmap.get(topKey);
+     const existinright = rightpointmap.get(rightKey);
+    if (existinfront&&existintop&&existinright) {
+   //  Logger.info(`rightKey:${rightKey}`)
+        const frontlineId=frontarcmap.get( formatKey(x1f,y1f,x2f,y2f));
+        const toplineId=toparcmap.get( formatKey(x1f,z1f,x2f,z2f));
+        const rightlineId=rightarcmap.get( formatKey(z1f,y1f,z2f,y2f));
+    
+if(frontlineId){
+  
+drawlines(x1f, y1f, z1f, x2f, y2f, z2f, frontlineId, 1, 1,0);
+}
+else if(toplineId){
+  drawlines(x1f, y1f, z1f, x2f, y2f, z2f, toplineId, 1, 1,1);
+}
+else if(rightlineId){
+  Logger.info(`rightlineId:${rightlineId}`)
+  drawlines(x1f, y1f, z1f, x2f, y2f, z2f, rightlineId, 1, 1,2);
+}
+else{drawlines(x1f, y1f, z1f, x2f, y2f, z2f, 0, 0, 1,-1);}
+      }
+      
+
+    
   }
 }
 
@@ -385,9 +472,51 @@ for (const [x1, y1, z1] of point3dlist) {
             
 Logger.info(`lines3d completed with ${lines3d.length} lines3d`);
                  lines3d.forEach(line => {
-
+                const [x1, y1, z1, x2, y2, z2, lineId, type,color,viewid] = line;
+                if(type===0){
                 PubSub.default.pub("njsgcs_makeline", line[0], line[1],  line[2], line[3], line[4], line[5], line[8]); 
-             })
+            }else if(type===1){
+              const entity=lineMap.get(lineId);
+               
+                            const arcEntity = entity as IArcEntity;
+                           const angleDelta = (arcEntity.endAngle-arcEntity.startAngle )*180/Math.PI;
+                         const center = arcEntity.center;
+                         const radius = arcEntity.radius;
+                  
+     if(viewid==2){
+const centerx=center.x-clusterMinx;
+const centery=center.y;
+const startX = centerx + radius * Math.cos(arcEntity.startAngle);
+const startY = center.y + radius * Math.sin(arcEntity.startAngle);
+const endX = centerx + radius * Math.cos(arcEntity.endAngle);
+    const endY = center.y + radius * Math.sin(arcEntity.endAngle);
+    if(startX==z1&&startY==y1&&endX==z2&&endY==y2)PubSub.default.pub("njsgcs_makearc", 1,0,0, x1,centery,centerx,x1, y1, z1,-(angleDelta+360)); 
+       
+     }
+     else if(viewid==0){
+const endX = center.x + radius * Math.cos(arcEntity.endAngle);
+    const endY = center.y + radius * Math.sin(arcEntity.endAngle);
+    const startX = center.x + radius * Math.cos(arcEntity.startAngle);
+     const startY = center.y + radius * Math.sin(arcEntity.startAngle);
+    // Logger.info(`startX:${startX} startY:${startY} endX:${endX} endY:${endY}`);
+    // Logger.info(`x1:${x1} y1:${y1} x2:${x2} y2:${y2}`)
+if(startX==x1&&startY==y1&&endX==x2&&endY==y2)PubSub.default.pub("njsgcs_makearc", 0,0,1, center.x,center.y,z1,x1, y1, z1,angleDelta+360); 
+     }
+     else if(viewid==1){
+      const centerx=center.x;
+const centery= center.y-clusterMinY;
+const startX = centerx + radius * Math.cos(arcEntity.startAngle);
+const startY = centery + radius * Math.sin(arcEntity.startAngle);
+const endX = center.x + radius * Math.cos(arcEntity.endAngle);
+    const endY =centery + radius * Math.sin(arcEntity.endAngle);
+        Logger.info(`startX:${startX} startY:${startY} endX:${endX} endY:${endY}`);
+    Logger.info(`x1:${x1} y1:${z1} x2:${x2} y2:${z2}`)
+if(startX==x1&&startY==z1&&endX==x2&&endY==z2)PubSub.default.pub("njsgcs_makearc", 0,1,0, centerx,y1,centery,x1, y1, z1,-(angleDelta+360)); 
+     }
+
+               
+            }
+              })
              ///////////////////////////////
                 // let i =0;
                 // // 发送每个线段给 njsgcs_makeline
