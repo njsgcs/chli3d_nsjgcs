@@ -1,4 +1,4 @@
-import { FaceNode } from "chili";
+import { ArcNode, FaceNode } from "chili";
 import {
     IDocument,
     IEdge,
@@ -74,7 +74,17 @@ function findCyclesWithEdgeIndices(
                     // 构造唯一标识符（排序节点）用于去重
                     const cycleKey = [...newPath].sort().join('-');
 
-                    if (!addedCycles.has(cycleKey)) {
+                    // 检查是否已存在更小的环
+                    let isSmallerCycle = true;
+                    for (const existingCycle of nodeCycles) {
+                        if (existingCycle[0] === start && existingCycle.length < newPath.length) {
+                            isSmallerCycle = false;
+                            break;
+                        }
+                    }
+
+                    if (!addedCycles.has(cycleKey) && isSmallerCycle) {
+                        // 去掉包含的环
                         nodeCycles.push(newPath);
                         addedCycles.add(cycleKey); // 标记为已添加
 
@@ -120,6 +130,10 @@ function findCyclesWithEdgeIndices(
 
     return { nodeCycles, edgeCycles };
 }
+
+
+
+
 function isPointsCoplanar(points: XYZ[]): boolean {
     if (points.length <= 3) return true; // 3个点或更少一定共面
 
@@ -186,7 +200,9 @@ export function face_rebuild(document: IDocument): void {
                      if (x === undefined) return false;
                      let shape = x.shape.value;
                      if (shape === undefined) return false;
-                   
+                     if (x instanceof ArcNode) {
+                               return false; // 排除 ArcNode 类型
+                           }
                      return true;
                  });
         document.selection.clearSelection();

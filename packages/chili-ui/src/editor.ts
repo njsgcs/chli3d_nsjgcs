@@ -5,9 +5,9 @@ import { Button, CommandKeys, I18nKeys, IApplication, PubSub, RibbonTab } from "
 import { div, Expander } from "./components";
 import style from "./editor.module.css";
 import { njsgcs_drawingView } from "./njsgcs/njsgcs_drawing_view";
+import { njsgcs_graphview } from "./njsgcs/njsgcs_graphView";
 import { njsgcs_MakeView } from "./njsgcs/njsgcs_makeView";
 import { njsgcs_ProjectView } from "./njsgcs/njsgcs_projectView";
-
 import { ProjectView } from "./project";
 import { PropertyView } from "./property";
 import { Ribbon, RibbonDataContent } from "./ribbon";
@@ -31,10 +31,12 @@ export class Editor extends HTMLElement {
     }
 
     private render(viewport: LayoutViewport) {
-        const expander = new Expander("viewport");
-        const expander2 = new Expander("viewport");
+      
+        const expander2 = new Expander("viewport1");
         const expander3 = new Expander("viewport2");
+        const expander4 = new Expander("viewport3");
         const drawingView = new njsgcs_drawingView();
+        const graphView = new njsgcs_graphview();
         const sidebarexpander = new Expander("sidebar");
         PubSub.default.sub("expenddrawview", () => {
 expander3.ExpanderClick(true);
@@ -43,7 +45,8 @@ expander2.ExpanderClick(false);
         });
         expander3.append(div({ className: style.viewport }, drawingView));
         expander2.append(div({ className: style.viewport }, viewport));
-        expander.append(div({ className: style.viewport }, expander2, expander3));
+        expander4.append(div({ className: style.viewport }, graphView));
+        
 
         sidebarexpander.append(
             div(
@@ -60,7 +63,9 @@ expander2.ExpanderClick(false);
                 }),
             ),
         );
-        const horizontalContainer = div({ className: style.horizontalLayout }, expander, sidebarexpander);
+        const horizontalContainer = div({ className: style.horizontalLayout }, 
+            div({ className: style.viewport }, expander2, expander3, expander4),
+             sidebarexpander);
         this.append(
             new Ribbon(this.ribbonContent),
 

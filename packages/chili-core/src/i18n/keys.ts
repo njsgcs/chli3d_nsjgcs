@@ -220,8 +220,9 @@ const I18N_KEYS = [
     "njsgcs_makeview",
     "njsgcs_changecamera",
     "njsgcs_drawview",
-    "viewport",
+    "viewport1",
     "viewport2",
+    "viewport3",
     "sidebar",
 ] as const;
 

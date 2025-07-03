@@ -1,5 +1,5 @@
 .viewport {
-    width: 80vw;
+    width: 85vw;
     height: 65vh;
 }
 
@@ -9,7 +9,7 @@
 }
 
 .sidebar {
-    flex: 0 0 60vh; /* 根据需要调整高度 */
+    flex: 0 0 68vh; /* 根据需要调整高度 */
    overflow: auto;
   
 }

@@ -47,6 +47,7 @@
     "@rspack/lite-tapable": "^1.0.1",
     "@tarikjabiri/dxf": "^2.8.9",
     "colorette": "^2.0.20",
+    "cytoscape": "^3.32.0",
     "dxf": "^5.2.0",
     "dxf-parser": "^1.1.2",
     "graphlib": "^2.1.8",
