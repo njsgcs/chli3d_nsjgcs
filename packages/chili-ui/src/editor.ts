@@ -8,7 +8,6 @@ import { njsgcs_drawingView } from "./njsgcs/njsgcs_drawing_view";
 import { njsgcs_graphview } from "./njsgcs/njsgcs_graphView";
 import { njsgcs_MakeView } from "./njsgcs/njsgcs_makeView";
 import { njsgcs_ProjectView } from "./njsgcs/njsgcs_projectView";
-import { ProjectView } from "./project";
 import { PropertyView } from "./property";
 import { Ribbon, RibbonDataContent } from "./ribbon";
 import { RibbonTabData } from "./ribbon/ribbonData";
@@ -43,6 +42,11 @@ expander3.ExpanderClick(true);
 expander2.ExpanderClick(false);
 
         });
+        PubSub.default.sub("expendgraphview", () => {
+            expander3.ExpanderClick(false);
+            expander2.ExpanderClick(false);
+            expander4.ExpanderClick(true);
+        })
         expander3.append(div({ className: style.viewport }, drawingView));
         expander2.append(div({ className: style.viewport }, viewport));
         expander4.append(div({ className: style.viewport }, graphView));
@@ -51,7 +55,7 @@ expander2.ExpanderClick(false);
         sidebarexpander.append(
             div(
                 { className: style.sidebar },
-                new ProjectView({ className: style.sidebarItem }),
+           //     new ProjectView({ className: style.sidebarItem }),
 
                 new PropertyView({ className: style.sidebarItem }),
 

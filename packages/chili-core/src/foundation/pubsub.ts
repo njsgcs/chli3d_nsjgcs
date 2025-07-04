@@ -77,7 +77,9 @@ export interface PubSubEventMap {
         oz: number,
         radius: number,
     ) => void;
+    njsgcs_graphview: (elements: any[]) => void;
     expenddrawview: () => void;
+    expendgraphview: () => void;
     njsgcs_changecamera: () => void;
     njsgcs_3drebuild: (document: Document) => void;
     njsgcs_drawview: (document: IDocument) => void;
