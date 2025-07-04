@@ -233,11 +233,12 @@ for (const [key, value] of arccomponentstartmap) {
   }
 
 
-
-const forwardmap = new Map<string, string>();
-const backwardmap = new Map<string, string>();
+const componentcyElements=new Array<cytoscape.ElementDefinition>();
+const forwardmap = new Map<string, string[]>();
+const backwardmap = new Map<string, string[]>();
 const transformmap = new Map<string, string>();
 const aparetimemap = new Map<string, number>();
+const startcompons = new Set<string>();
 for (const [key, value] of arccentermap) {
   const part1: { start: string, end: string }[] = [];
   const part2: { start: string, end: string }[] = [];
@@ -275,10 +276,13 @@ for (const [key, value] of arccentermap) {
   const dedupedPart2 = deduplicate(part2);
  const dedupedPart1key=JSON.stringify(dedupedPart1);
   const dedupedPart2key=JSON.stringify(dedupedPart2);
- 
-forwardmap.set( dedupedPart1key, dedupedPart2key);
-backwardmap.set( dedupedPart2key, dedupedPart1key);
+ componentcyElements.push({ data: { id: dedupedPart1key} });
+ componentcyElements.push({ data: { id: dedupedPart2key} });
+ componentcyElements.push({ data: { id: key, source: dedupedPart1key, target: dedupedPart2key } });
+forwardmap.get(dedupedPart1key)?.push(dedupedPart2key) ||forwardmap.set( dedupedPart1key, [dedupedPart2key]);
+backwardmap.get(dedupedPart2key)?.push(dedupedPart1key) || backwardmap.set( dedupedPart2key, [dedupedPart1key]);
   transformmap.set( dedupedPart1key+dedupedPart2key, key);
+  startcompons.add(dedupedPart1key);
 const count1 = aparetimemap.get(dedupedPart1key) || 0;
 aparetimemap.set(dedupedPart1key, count1 + 1);
 
@@ -287,10 +291,69 @@ const count2 = aparetimemap.get(dedupedPart2key) || 0;
 aparetimemap.set(dedupedPart2key, count2 + 1);
 
 }
+for (const element of componentcyElements) {
+  if (element.data && startcompons.has(element.data.id!)) {
+    element.data["label"] = "start";
+  }
+}
+//PubSub.default.pub("njsgcs_graphview",componentcyElements);
+
 const singleOccurrenceKeys = Array.from(aparetimemap.entries())
   .filter(([_, count]) => count === 1)
   .map(([key]) => key);
+function processKey(
+  key: string,
+  transformer: Matrix4,
+  isForward: boolean,
+  queue: { currentKey: string; currenttransformer: Matrix4 }[],
+  visited: Set<string>
+) {
+  if (visited.has(key)) return;
+  visited.add(key);
 
+  const map = isForward ? forwardmap : backwardmap;
+  const keys = map.get(key)!;
+
+  for (const nextKey of keys) {
+    const nodesid = transformmap.get(isForward ? key + nextKey : nextKey + key);
+    const nodeid = arccentermap.get(nodesid!)![0];
+    const arcNode = arcnodemap.get(nodeid);
+
+    if (!arcNode) continue;
+
+    const center = transformer.ofPoint(arcNode.center);
+    const normal = arcNode.normal;
+    const angle = arcNode.angle;
+    const rangle = isForward ? angle! * Math.PI / 180 : -angle! * Math.PI / 180;
+
+    const newTransformer = transformer.multiply(Matrix4.createRotationAt(center, normal!, rangle));
+
+    // 推入队列
+    queue.push({ currentKey: nextKey, currenttransformer: newTransformer });
+
+    // 解析边数据并绘制线段
+    const edges: { start: string; end: string }[] = JSON.parse(nextKey);
+    drawLines(edges, newTransformer);
+  }
+}
+
+function drawLines(edges: { start: string; end: string }[], transformer: Matrix4) {
+  for (const { start, end } of edges) {
+    const [sx, sy, sz] = start.split('-').map(Number);
+    const [ex, ey, ez] = end.split('-').map(Number);
+
+    const startxyz = new XYZ(sx, sy, sz);
+    const endxyz = new XYZ(ex, ey, ez);
+
+    const startTrans = transformer.ofPoint(startxyz);
+    const endTrans = transformer.ofPoint(endxyz);
+
+    PubSub.default.pub("njsgcs_makeline",
+      startTrans.x, startTrans.y, startTrans.z + 50,
+      endTrans.x, endTrans.y, endTrans.z + 50, 1
+    );
+  }
+}
 // 将其转换为原始结构并取第一个元素
 if (singleOccurrenceKeys.length > 0) {
   let firstKey = singleOccurrenceKeys[0]; // 取第一个 key
@@ -305,66 +368,23 @@ if (singleOccurrenceKeys.length > 0) {
    PubSub.default.pub("njsgcs_makeline",
         startxyz.x,startxyz.y,startxyz.z+50,endxyz.x,endxyz.y,endxyz.z+50, 1
     );}
- let secondKey="";
+
  let totaltransformer = Matrix4.identity();
  
-  const seen = new Set();
-  while(1){
-  if(forwardmap.has(firstKey)){
-     console.log(" firstKey：", firstKey);
-     secondKey=forwardmap.get(firstKey)!;
-     seen.add(firstKey);
-     seen.add(secondKey);
-    console.log("forwardmap secondKey:",secondKey);
-    const nodesid=transformmap.get(firstKey+secondKey);
-    const nodeid=arccentermap.get(nodesid!)![0];
-    const  node =arcnodemap.get(nodeid);
-    const center=totaltransformer.ofPoint(node?.center!);
-    const normal=node?.normal;
-    const angle=node?.angle;
-     const rangle = angle! * Math.PI / 180;
-     totaltransformer = totaltransformer
-            .multiply(Matrix4.createRotationAt(center,normal!,rangle));
-   Logger.info("angle:", angle);
- 
-  firstKey=secondKey;
 
-  }else if(backwardmap.has(firstKey)){
-    secondKey=backwardmap.get(firstKey)!;
-     seen.add(firstKey);
-     seen.add(secondKey);
-    console.log("backwardmap secondKey:",secondKey);
-    const nodesid=transformmap.get(secondKey+firstKey);
-    const nodeid=arccentermap.get(nodesid!)![0];
-    const  node =arcnodemap.get(nodeid);
-    const center=totaltransformer.ofPoint(node?.center!);
-    const normal=node?.normal;
-    const angle=node?.angle;
-     const rangle = -angle! * Math.PI / 180;
-     totaltransformer = totaltransformer.multiply(Matrix4.createRotationAt(center,normal!,rangle));
-   Logger.info("angle:", angle);
-     firstKey=secondKey;
+const queue = [{ currentKey: firstKey, currenttransformer: totaltransformer }];
+const visited = new Set<string>();
+
+while (queue.length > 0) {
+  let { currentKey, currenttransformer } = queue.shift()!;
+
+  if (visited.has(currentKey)) continue;
+
+  if (forwardmap.has(currentKey)) {
+    processKey(currentKey, currenttransformer, true, queue, visited);
+  } else if (backwardmap.has(currentKey)) {
+    processKey(currentKey, currenttransformer, false, queue, visited);
   }
-  
-  
-   edges=JSON.parse(secondKey!);           
-         for (const {start, end} of edges) {
-             const [startx, starty, startz] = start.split('-').map(Number); 
-             const startxyz = new XYZ(startx, starty, startz);
-              const  starttrans=totaltransformer.ofPoint(startxyz);
-             const [endx, endy, endz] = end.split('-').map(Number);
-             const endxyz = new XYZ(endx, endy, endz);
-   const endtrans=totaltransformer.ofPoint(endxyz);
-   PubSub.default.pub("njsgcs_makeline",
-        starttrans.x,starttrans.y,starttrans.z+50,endtrans.x,endtrans.y,endtrans.z+50, 1
-    );
-
-         }
-          Logger.info("seen.size:", seen.size,"arccentermap.size:",arccentermap.size+1);
-  if(seen.size==arccentermap.size+1){
-    
-    return ;}
- 
 }
 
 } else {
