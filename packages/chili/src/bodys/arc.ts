@@ -4,12 +4,13 @@
 import {
     I18nKeys,
     IDocument,
+    IEdge,
     IShape,
     ParameterShapeNode,
     Property,
     Result,
     Serializer,
-    XYZ,
+    XYZ
 } from "chili-core";
 
 @Serializer.register(["document", "normal", "center", "start", "angle"])
@@ -38,6 +39,14 @@ export class ArcNode extends ParameterShapeNode {
         return this.getPrivateValue("normal");
     }
 
+        @Serializer.serialze()
+        @Property.define("arc.end")
+    get end(): XYZ {
+        return this.getPrivateValue("end");
+    }
+    set end(value: XYZ) {
+        this.setPropertyEmitShapeChanged("end", value);
+    }
     @Serializer.serialze()
     @Property.define("arc.angle")
     get angle() {
@@ -45,13 +54,6 @@ export class ArcNode extends ParameterShapeNode {
     }
     set angle(value: number) {
         this.setPropertyEmitShapeChanged("angle", value);
-    }
-        @Property.define("arc.end")
-    get end(): XYZ {
-        return this.getPrivateValue("end");
-    }
-    set end(value: XYZ) {
-        this.setPropertyEmitShapeChanged("end", value);
     }
 
 constructor(document: IDocument, normal: XYZ, center: XYZ, start: XYZ, angle: number) {
@@ -61,32 +63,25 @@ constructor(document: IDocument, normal: XYZ, center: XYZ, start: XYZ, angle: nu
     this.setPrivateValue("start", start);
     this.setPrivateValue("angle", angle);
 
-    let end: XYZ;
+    
+    const edge=this.shape.value.copy()as unknown as IEdge; 
+    const endPoint=edge.curve().endPoint();
+    const startPoint=edge.curve().startPoint();
 
-    if (normal.x === 0 && normal.y === 0 && normal.z === 1) {
-        // XY 平面
-        const endx = parseFloat((this.start.x + Math.cos(this.angle)).toFixed(1));
-        const endy = parseFloat((this.start.y + Math.sin(this.angle)).toFixed(1));
-        const endz = parseFloat(this.start.z.toFixed(1));
-        end = new XYZ(endx, endy, endz);
-    } else if (normal.x === 0 && normal.y === 1 && normal.z === 0) {
-        // XZ 平面，绕 Y 轴旋转
-        const endx = parseFloat((this.start.x + Math.cos(this.angle)).toFixed(1));
-        const endz = parseFloat((this.start.z + Math.sin(this.angle)).toFixed(1));
-        const endy = parseFloat(this.start.y.toFixed(1));
-        end = new XYZ(endx, endy, endz);
-    } else if (normal.x === 1 && normal.y === 0 && normal.z === 0) {
-        // YZ 平面，绕 X 轴旋转
-        const endy = parseFloat((this.start.y + Math.cos(this.angle)).toFixed(1));
-        const endz = parseFloat((this.start.z + Math.sin(this.angle)).toFixed(1));
-        const endx = parseFloat(this.start.x.toFixed(1));
-        end = new XYZ(endx, endy, endz);
-    } else {
-        // 默认 fallback：不自动计算 end，或抛出警告
-        end = new XYZ(0, 0, 0); // 或 throw new Error("Unsupported normal direction");
+function pointsEqual(a: XYZ, b: XYZ): boolean {
+    const tolerance = 0.1;
+    return (
+        Math.abs(a.x - b.x) < tolerance &&
+        Math.abs(a.y - b.y) < tolerance &&
+        Math.abs(a.z - b.z) < tolerance
+    );
+}   
+    if(!pointsEqual(startPoint,start)){
+         this.setPrivateValue("end", startPoint);
+    }else{
+        this.setPrivateValue("end", endPoint);
     }
-
-    this.setPrivateValue("end", end);
+   
 }
 
     generateShape(): Result<IShape, string> {

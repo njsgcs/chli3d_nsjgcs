@@ -1,4 +1,4 @@
-import { ArcNode } from "chili";
+import { ArcNode, CircleNode, } from "chili";
 import {
   IDocument,
   IEdge,
@@ -7,6 +7,7 @@ import {
   Matrix4,
   PubSub,
   ShapeNode,
+
   XYZ
 } from "chili-core";
 import cytoscape from "cytoscape";
@@ -33,7 +34,7 @@ export function unfold(document: IDocument): void {
   
    
     
-    
+    const CircleNodes: CircleNode[]=[];
     const models= getAllNodes(document.rootNode)  
                  
                  .map((x) => x as ShapeNode)
@@ -45,6 +46,9 @@ export function unfold(document: IDocument): void {
                     //     arcnodes.push(x);
                     //            return false; // 排除 ArcNode 类型
                     //        }
+                     if (x instanceof   CircleNode) {
+                       CircleNodes.push(x);
+                     }
                      return true;
                  });
         document.selection.clearSelection();
@@ -62,8 +66,8 @@ for (let i = 0; i < models.length; i++) {
   const model = models[i];
   
   const edge = model.shape.value.copy() as IEdge;
-  const end = edge.curve().startPoint();
-  const start = edge.curve().endPoint();
+  const start = edge.curve().startPoint();
+  const end = edge.curve().endPoint();
 
   // 使用唯一标识符作为节点 ID，比如坐标点字符串
   const startId = `${start.x.toFixed(1)}-${start.y.toFixed(1)}-${start.z.toFixed(1)}`;
@@ -164,9 +168,10 @@ for (const [key, value] of arccentermap) {
   for (const i of value) {
     const arc = arcnodemap.get(i);
     if(arc){
-      const edge= arc.shape.value.copy() as IEdge;
-      const end = edge.curve().startPoint();
-       const  start= edge.curve().endPoint();
+      
+    const start=arc.start;
+    const end=arc.end;
+      
       
     
       const startId = `${start.x.toFixed(1)}-${start.y.toFixed(1)}-${start.z.toFixed(1)}`;
@@ -310,7 +315,51 @@ const singleOccurrenceKeys = Array.from(aparetimemap.entries())
   .filter(([_, count]) => count === 1)
   .map(([key]) => key);
 
+
+
+function computeBoundingBox(points: XYZ[]): {
+  minx: number;
+  miny: number;
+  minz: number;
+  maxx: number;
+  maxy: number;
+  maxz: number;
+} {
+  if (points.length === 0) {
+    throw new Error("Point list is empty.");
+  }
+
+    const BoundingBox: {
+  minx: number;
+  miny: number;
+  minz: number;
+  maxx: number;
+  maxy: number;
+  maxz: number;
+}={
+  minx: Infinity,
+  miny: Infinity,
+  minz: Infinity,
+  maxx: -Infinity,
+  maxy: -Infinity,
+  maxz: -Infinity
+}
+  
+
+  for (const point of points) {
+    if (point.x < BoundingBox.minx) BoundingBox.minx = point.x;
+    if (point.y < BoundingBox.miny) BoundingBox.miny = point.y;
+    if (point.z < BoundingBox.minz) BoundingBox.minz = point.z;
+    if (point.x > BoundingBox.maxx) BoundingBox.maxx = point.x;
+    if (point.y > BoundingBox.maxy) BoundingBox.maxy = point.y;
+    if (point.z > BoundingBox.maxz) BoundingBox.maxz = point.z;
+  }
+
+  return BoundingBox;
+}
 function drawLines(edges: { start: string; end: string }[], transformer: Matrix4,color: number) {
+
+ let points: XYZ[] = [];
   for (const { start, end } of edges) {
     const [sx, sy, sz] = start.split('-').map(Number);
     const [ex, ey, ez] = end.split('-').map(Number);
@@ -318,6 +367,7 @@ function drawLines(edges: { start: string; end: string }[], transformer: Matrix4
     const startxyz = new XYZ(sx, sy, sz);
     const endxyz = new XYZ(ex, ey, ez);
 
+    points.push(startxyz, endxyz);
     const startTrans = transformer.ofPoint(startxyz);
     const endTrans = transformer.ofPoint(endxyz);
 
@@ -326,6 +376,23 @@ function drawLines(edges: { start: string; end: string }[], transformer: Matrix4
       endTrans.x, endTrans.y, endTrans.z + 50, color
     );
   }
+ const BoundingBox= computeBoundingBox( points);
+ Logger.info(`BoundingBox:`, BoundingBox);
+ for (const circlenode  of CircleNodes){
+const center=circlenode.center;
+const  radius=circlenode.radius;
+const normal=circlenode.normal;
+if (circlenode.center.x >= BoundingBox.minx && circlenode.center.x <= BoundingBox.maxx &&
+    circlenode.center.y >= BoundingBox.miny && circlenode.center.y <= BoundingBox.maxy &&
+    circlenode.center.z >= BoundingBox.minz && circlenode.center.z <= BoundingBox.maxz) {
+      Logger.info(`circle in bounding box`);
+    const centerTrans = transformer.ofPoint(circlenode.center);
+    const normalTrans = transformer.ofVector(circlenode.normal).normalize()!;
+    PubSub.default.pub("njsgcs_makecircle",normalTrans.x, normalTrans.y, normalTrans.z, centerTrans.x, centerTrans.y, centerTrans.z+50, radius);
+
+    }
+
+ }
 }
 // 将其转换为原始结构并取第一个元素
 if (singleOccurrenceKeys.length > 0) {
@@ -381,10 +448,12 @@ Logger.info(`keys: ${keys.length}，isforward: ${isforward}`);
     const angle = arcNode.angle;
     const rangle = isforward ? angle! * Math.PI / 180 :-angle! * Math.PI / 180;
    Logger.info(`center: ${arcNode.center.x},${arcNode.center.y},${arcNode.center.z}`);
-   Logger.info(`normal: ${normal.x},${normal.y},${normal.z}`);
+   Logger.info(`normal: ${arcNode.normal.x},${arcNode.normal.y},${arcNode.normal.z}`);
    Logger.info(`angle: ${angle}`);
    Logger.info(`rangle: ${rangle*180/Math.PI}`);
-    const newTransformer = transformer.multiply(Matrix4.createRotationAt(center, normal!,-rangle));
+   Logger.info(`-----------------------------`);
+    const newTransformer = transformer.multiply(
+      Matrix4.createRotationAt(center, normal!,-rangle));
 
     // 推入队列
     queue.push({ currentKey: nextKey, currenttransformer: newTransformer });
