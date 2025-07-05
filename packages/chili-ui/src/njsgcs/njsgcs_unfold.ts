@@ -57,16 +57,17 @@ const arcnodemap: Map<number, ArcNode> = new Map();
 
 let arcid=0;
      const arcStartIds = new Set<string>();
+     const arcEndIds = new Set<string>();
 for (let i = 0; i < models.length; i++) {
   const model = models[i];
   
   const edge = model.shape.value.copy() as IEdge;
-  const start = edge.curve().startPoint();
-  const end = edge.curve().endPoint();
+  const end = edge.curve().startPoint();
+  const start = edge.curve().endPoint();
 
   // 使用唯一标识符作为节点 ID，比如坐标点字符串
-  const startId = `${start.x}-${start.y}-${start.z}`;
-  const endId = `${end.x}-${end.y}-${end.z}`;
+  const startId = `${start.x.toFixed(1)}-${start.y.toFixed(1)}-${start.z.toFixed(1)}`;
+  const endId = `${end.x.toFixed(1)}-${end.y.toFixed(1)}-${end.z.toFixed(1)}`;
 
   // 添加起点节点（如果未添加过）
  if (!nodeSet.has(startId)) {
@@ -88,9 +89,10 @@ for (let i = 0; i < models.length; i++) {
       // 添加边
       
      arcStartIds.add(startId);
+     arcEndIds.add(endId);
        arcnodemap.set(arcid,model);
        arcid++;
-      Logger.info(i," ArcNode");
+      Logger.info(i," ArcNode:","start:",startId,"end:",endId,"angle:",model.angle);
   cyElements.push({
     data: {
       id: `${i}`,
@@ -123,6 +125,9 @@ for (const element of cyElements) {
   if (element.data && arcStartIds.has(element.data.id!)) {
     element.data["label"] = "start";
   }
+  // if (element.data && arcEndIds.has(element.data.id!)) {
+  //   element.data["label"] = "end";
+  // }
 }
 /**
  * 存储弧中心点与对应的弧节点 ID 列表的映射
@@ -138,15 +143,15 @@ for (let i = 0; i < arcid+1; i++) {
     const center = arcnode.center;
     const normal = arcnode.normal;
      if (normal.x === 0 && normal.y === 0 && normal.z === 1) {
-      const centerId = `${center.x}-${center.y}`; // 只取 x 和 y
+      const centerId = `${center.x.toFixed(1)}-${center.y.toFixed(1)}`; // 只取 x 和 y
       arccentermap.get(centerId)?.push(i) || arccentermap.set(centerId, [i]); // 存入 map 中
   
     }else if (normal.x === 0 && normal.y === 1 && normal.z === 0) {
-      const centerId = `${center.x}-${center.z}`; // 只取 x 和 z
+      const centerId = `${center.x.toFixed(1)}-${center.z.toFixed(1)}`; // 只取 x 和 z
        arccentermap.get(centerId)?.push(i) || arccentermap.set(centerId, [i]); // 存入 map 中
     }
     else if (normal.x === 1 && normal.y === 0 && normal.z === 0) {
-      const centerId = `${center.y}-${center.z}`; // 只取 y 和 z
+      const centerId = `${center.y.toFixed(1)}-${center.z.toFixed(1)}`; // 只取 y 和 z
        arccentermap.get(centerId)?.push(i) || arccentermap.set(centerId, [i]); // 存入 map 中
     }
   }
@@ -160,11 +165,14 @@ for (const [key, value] of arccentermap) {
     const arc = arcnodemap.get(i);
     if(arc){
       const edge= arc.shape.value.copy() as IEdge;
-      const start = edge.curve().startPoint();
-      const startId = `${start.x}-${start.y}-${start.z}`;
+      const end = edge.curve().startPoint();
+       const  start= edge.curve().endPoint();
+      
+    
+      const startId = `${start.x.toFixed(1)}-${start.y.toFixed(1)}-${start.z.toFixed(1)}`;
       arccenterstartpointmap.get(key)?.push(startId) || arccenterstartpointmap.set(key, [startId]);
-      const end = edge.curve().endPoint();
-      const endId = `${end.x}-${end.y}-${end.z}`;
+     
+      const endId = `${end.x.toFixed(1)}-${end.y.toFixed(1)}-${end.z.toFixed(1)}`;
       arccenterendpointmap.get(key)?.push(endId) || arccenterendpointmap.set(key, [endId]);
       const angle = arc.angle;
       Logger.info(`ARC:${i}: ${start} ${end} ${angle}`);
@@ -301,43 +309,8 @@ for (const element of componentcyElements) {
 const singleOccurrenceKeys = Array.from(aparetimemap.entries())
   .filter(([_, count]) => count === 1)
   .map(([key]) => key);
-function processKey(
-  key: string,
-  transformer: Matrix4,
-  isForward: boolean,
-  queue: { currentKey: string; currenttransformer: Matrix4 }[],
-  visited: Set<string>
-) {
-  if (visited.has(key)) return;
-  visited.add(key);
 
-  const map = isForward ? forwardmap : backwardmap;
-  const keys = map.get(key)!;
-
-  for (const nextKey of keys) {
-    const nodesid = transformmap.get(isForward ? key + nextKey : nextKey + key);
-    const nodeid = arccentermap.get(nodesid!)![0];
-    const arcNode = arcnodemap.get(nodeid);
-
-    if (!arcNode) continue;
-
-    const center = transformer.ofPoint(arcNode.center);
-    const normal = arcNode.normal;
-    const angle = arcNode.angle;
-    const rangle = isForward ? angle! * Math.PI / 180 : -angle! * Math.PI / 180;
-
-    const newTransformer = transformer.multiply(Matrix4.createRotationAt(center, normal!, rangle));
-
-    // 推入队列
-    queue.push({ currentKey: nextKey, currenttransformer: newTransformer });
-
-    // 解析边数据并绘制线段
-    const edges: { start: string; end: string }[] = JSON.parse(nextKey);
-    drawLines(edges, newTransformer);
-  }
-}
-
-function drawLines(edges: { start: string; end: string }[], transformer: Matrix4) {
+function drawLines(edges: { start: string; end: string }[], transformer: Matrix4,color: number) {
   for (const { start, end } of edges) {
     const [sx, sy, sz] = start.split('-').map(Number);
     const [ex, ey, ez] = end.split('-').map(Number);
@@ -350,41 +323,78 @@ function drawLines(edges: { start: string; end: string }[], transformer: Matrix4
 
     PubSub.default.pub("njsgcs_makeline",
       startTrans.x, startTrans.y, startTrans.z + 50,
-      endTrans.x, endTrans.y, endTrans.z + 50, 1
+      endTrans.x, endTrans.y, endTrans.z + 50, color
     );
   }
 }
 // 将其转换为原始结构并取第一个元素
 if (singleOccurrenceKeys.length > 0) {
   let firstKey = singleOccurrenceKeys[0]; // 取第一个 key
-    let edges:{ start: string, end: string }[]=JSON.parse(firstKey!);           
-         for (const {start, end} of edges) {
-             const [startx, starty, startz] = start.split('-').map(Number); 
-             const startxyz = new XYZ(startx, starty, startz);
-         
-             const [endx, endy, endz] = end.split('-').map(Number);
-             const endxyz = new XYZ(endx, endy, endz);
- 
-   PubSub.default.pub("njsgcs_makeline",
-        startxyz.x,startxyz.y,startxyz.z+50,endxyz.x,endxyz.y,endxyz.z+50, 1
-    );}
-
- let totaltransformer = Matrix4.identity();
+   
+ let firstformer = Matrix4.identity();
  
 
-const queue = [{ currentKey: firstKey, currenttransformer: totaltransformer }];
+const queue = [{ currentKey: firstKey, currenttransformer: firstformer }];
 const visited = new Set<string>();
-
+let color=1;
 while (queue.length > 0) {
   let { currentKey, currenttransformer } = queue.shift()!;
 
-  if (visited.has(currentKey)) continue;
 
-  if (forwardmap.has(currentKey)) {
-    processKey(currentKey, currenttransformer, true, queue, visited);
-  } else if (backwardmap.has(currentKey)) {
-    processKey(currentKey, currenttransformer, false, queue, visited);
+ 
+  processKey(currentKey, currenttransformer, queue, visited);
+}
+
+function processKey(
+  key: string,
+  transformer: Matrix4,
+ 
+  queue: { currentKey: string; currenttransformer: Matrix4 }[],
+  visited: Set<string>
+) {
+  Logger.info(`processing ${key}`);
+  if (visited.has(key)) {Logger.info(`visited`);return;}
+  visited.add(key);
+   const edges: { start: string; end: string }[] = JSON.parse(key);
+    drawLines(edges, transformer,color);
+    
+Logger.info(`color ${color},transformer: `,transformer.toArray());
+color++;
+  const forwardkeys=forwardmap.get(key)|| [];
+  const backwardkeys=backwardmap.get(key)|| [];
+  const keysandforward = [{keys:forwardkeys,isforward:true},{keys:backwardkeys,isforward:false}];
+for (const {keys,isforward} of keysandforward) { 
+Logger.info(`keys: ${keys.length}，isforward: ${isforward}`);
+
+ for (const nextKey of keys) {
+   
+ if (visited.has( nextKey)) {Logger.info(`next  key visited`);continue;}
+  
+    const nodesid = transformmap.get(isforward ? key + nextKey : nextKey + key);
+    const nodeid = arccentermap.get(nodesid!)![0];
+    const arcNode = arcnodemap.get(nodeid);
+
+    if (!arcNode) continue;
+
+    const center = transformer.ofPoint(arcNode.center);
+    const normal =  transformer.ofVector(arcNode.normal).normalize()!;
+    const angle = arcNode.angle;
+    const rangle = isforward ? angle! * Math.PI / 180 :-angle! * Math.PI / 180;
+   Logger.info(`center: ${arcNode.center.x},${arcNode.center.y},${arcNode.center.z}`);
+   Logger.info(`normal: ${normal.x},${normal.y},${normal.z}`);
+   Logger.info(`angle: ${angle}`);
+   Logger.info(`rangle: ${rangle*180/Math.PI}`);
+    const newTransformer = transformer.multiply(Matrix4.createRotationAt(center, normal!,-rangle));
+
+    // 推入队列
+    queue.push({ currentKey: nextKey, currenttransformer: newTransformer });
+
+    // 解析边数据并绘制线段
+  
   }
+
+}
+ 
 }
 
 } else {

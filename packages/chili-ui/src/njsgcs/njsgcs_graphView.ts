@@ -79,6 +79,14 @@ this.cy.center();
           },
           
         },
+          {
+          selector: 'node[label = "end"]',
+          style: {
+            'background-color':  '#228b22',
+            label: 'data(id)',
+          },
+          
+        },
         {
           selector: 'edge',
           style: {

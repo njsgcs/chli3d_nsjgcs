@@ -8,6 +8,7 @@ export default {
     code: "zh-CN",
     translation: {
         "arc.angle": "角度",
+        "arc.end": "终点",
         "arc.start": "起点",
         "axis.x": "X 轴",
         "axis.y": "Y 轴",

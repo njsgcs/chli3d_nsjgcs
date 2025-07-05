@@ -4,6 +4,7 @@
 const I18N_KEYS = [
     "arc.angle",
     "arc.start",
+    "arc.end",
     "axis.x",
     "axis.y",
     "axis.z",

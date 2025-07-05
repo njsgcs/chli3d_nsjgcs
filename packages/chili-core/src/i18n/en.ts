@@ -9,6 +9,7 @@ export default {
     translation: {
         "arc.angle": "Angle",
         "arc.start": "Start",
+        "arc.end": "End",
         "axis.x": "X Axis",
         "axis.y": "Y Axis",
         "axis.z": "Z Axis",
