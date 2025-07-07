@@ -1,14 +1,14 @@
 import { ArcNode, CircleNode, } from "chili";
 import {
-  IDocument,
-  IEdge,
-  INode,
-  Logger,
-  Matrix4,
-  PubSub,
-  ShapeNode,
+    IDocument,
+    IEdge,
+    INode,
+    Logger,
+    Matrix4,
+    PubSub,
+    ShapeNode,
 
-  XYZ
+    XYZ
 } from "chili-core";
 import cytoscape from "cytoscape";
 
@@ -379,9 +379,9 @@ function drawLines(edges: { start: string; end: string }[], transformer: Matrix4
  const BoundingBox= computeBoundingBox( points);
  Logger.info(`BoundingBox:`, BoundingBox);
  for (const circlenode  of CircleNodes){
-const center=circlenode.center;
+
 const  radius=circlenode.radius;
-const normal=circlenode.normal;
+
 if (circlenode.center.x >= BoundingBox.minx && circlenode.center.x <= BoundingBox.maxx &&
     circlenode.center.y >= BoundingBox.miny && circlenode.center.y <= BoundingBox.maxy &&
     circlenode.center.z >= BoundingBox.minz && circlenode.center.z <= BoundingBox.maxz) {

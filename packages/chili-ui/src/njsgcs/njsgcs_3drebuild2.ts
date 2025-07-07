@@ -183,6 +183,8 @@ const startY = center.y + radius * Math.sin(startAngle);
                           inputlines.push([startx, starty, endx, endy,lineId,2]);
                           lineId++;
 
+                        }else{
+                          Logger.info(`Unsupported entity type: ${entity.type}`);
                         }
 
                     });
